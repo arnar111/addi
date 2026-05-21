@@ -1,15 +1,47 @@
+import { useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { User, MapPin, Trash2, Info, Timer, Download, Upload, ShoppingCart } from 'lucide-react'
+
+const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_name', 'addi_city']
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const importRef = useRef()
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
-    keys.forEach(k => localStorage.removeItem(k))
+    DATA_KEYS.forEach(k => localStorage.removeItem(k))
     window.location.reload()
+  }
+
+  const exportData = () => {
+    const data = {}
+    DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v) data[k] = v })
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `addi-backup-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importData = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result)
+        Object.entries(parsed).forEach(([k, v]) => localStorage.setItem(k, v))
+        window.location.reload()
+      } catch {
+        alert('Ógildur backup skrá')
+      }
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -33,7 +65,29 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="card flex flex-col gap-3">
+        <span className="font-semibold text-sm">Flýtileiðir</span>
+        <div className="grid grid-cols-2 gap-2">
+          <Link
+            to="/timer"
+            className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
+          >
+            <Timer size={16} style={{ color: 'var(--accent)' }} />
+            <span className="text-sm font-medium">Tímari</span>
+          </Link>
+          <Link
+            to="/shopping"
+            className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
+          >
+            <ShoppingCart size={16} style={{ color: 'var(--accent)' }} />
+            <span className="text-sm font-medium">Innkaup</span>
+          </Link>
         </div>
       </div>
 
@@ -45,7 +99,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -58,12 +112,31 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
         <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          Á iPhone: Safari → <strong style={{ color: 'var(--text)' }}>Deila</strong> → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong> til að nota Addi eins og native app með fulla skjástærð.
+        </p>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Á Android: Chrome → þriggja punkta valmynd → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong>.
+        </p>
+      </div>
+
+      {/* Data backup */}
+      <div className="card flex flex-col gap-3">
+        <span className="font-semibold text-sm">Gögn</span>
+        <div className="flex gap-2">
+          <button onClick={exportData} className="btn btn-ghost flex-1 justify-center text-sm">
+            <Download size={14} /> Taka öryggisafrit
+          </button>
+          <button onClick={() => importRef.current?.click()} className="btn btn-ghost flex-1 justify-center text-sm">
+            <Upload size={14} /> Endurheimt
+          </button>
+          <input ref={importRef} type="file" accept=".json" onChange={importData} className="hidden" />
+        </div>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Gögn eru vistuð í vafra. Taktu öryggisafrit reglulega til að missa ekki gögn.
         </p>
       </div>
 
@@ -73,7 +146,7 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>Eyðir öllum gögnum. Ekki hægt að afturkalla.</p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>

@@ -1,4 +1,9 @@
-export function getGreeting(name = 'Arnar') {
+function getName() {
+  try { return JSON.parse(localStorage.getItem('addi_name')) || 'Arnar' } catch { return 'Arnar' }
+}
+
+export function getGreeting() {
+  const name = getName()
   const h = new Date().getHours()
   if (h < 5) return `Góða nótt, ${name}`
   if (h < 12) return `Góðan daginn, ${name}`
@@ -22,8 +27,7 @@ export function formatDateShort(dateStr) {
 
 export function isToday(dateStr) {
   const d = new Date(dateStr)
-  const today = new Date()
-  return d.toDateString() === today.toDateString()
+  return d.toDateString() === new Date().toDateString()
 }
 
 export function isPast(dateStr) {
