@@ -1,4 +1,4 @@
-export function getGreeting(name = 'Arnar') {
+export function getGreeting(name = 'Addi') {
   const h = new Date().getHours()
   if (h < 5) return `Góða nótt, ${name}`
   if (h < 12) return `Góðan daginn, ${name}`
