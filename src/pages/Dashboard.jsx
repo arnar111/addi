@@ -8,6 +8,7 @@ import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
 import WorldCupWidget from '../components/widgets/WorldCupWidget'
 import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidget'
+import NewsWidget from '../components/widgets/NewsWidget'
 
 function HuelCountdown() {
   const nextDelivery = new Date('2026-05-27')
@@ -78,6 +79,9 @@ export default function Dashboard() {
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
+
+      {/* Morning reads */}
+      <NewsWidget />
 
       {/* Quick note */}
       <QuickNoteWidget />

@@ -128,8 +128,20 @@ html, body, #root {
 }
 .animate-slide-up { animation: slideUp 0.3s ease; }
 
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
-.safe-top { padding-top: env(safe-area-inset-top, 0px); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px); }
+.safe-top { padding-top: max(env(safe-area-inset-top, 0px), 0px); }
+
+/* Active/press feedback for touch */
+button:active { transform: scale(0.97); }
+a:active { opacity: 0.75; }
+
+/* Smooth scroll everywhere */
+* { scroll-behavior: smooth; }
+
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+  .btn { min-height: 40px; }
+}
 
 /* Checkbox custom */
 input[type="checkbox"] {
