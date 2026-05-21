@@ -6,6 +6,34 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
+import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidget'
+
+function HuelCountdown() {
+  const nextDelivery = new Date('2026-05-27')
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const diff = Math.ceil((nextDelivery - today) / (1000 * 60 * 60 * 24))
+
+  if (diff < 0 || diff > 10) return null
+
+  return (
+    <div className="card flex items-center gap-3"
+         style={{ border: '1px solid rgba(249,115,22,0.25)', background: 'rgba(249,115,22,0.06)' }}>
+      <span className="text-xl">💪</span>
+      <div className="flex-1">
+        <div className="text-sm font-medium">Næsta Huel sending</div>
+        <div className="text-xs" style={{ color: 'var(--muted)' }}>
+          {diff === 0 ? 'Kemur í dag!' : diff === 1 ? 'Kemur á morgun' : `${diff} dagar eftir · 27. maí`}
+        </div>
+      </div>
+      <span className="text-xs font-semibold px-2 py-1 rounded-lg"
+            style={{ background: 'rgba(249,115,22,0.15)', color: '#f97316' }}>
+        {diff === 0 ? 'Í dag!' : `${diff}d`}
+      </span>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -29,6 +57,15 @@ export default function Dashboard() {
 
       {/* Weather */}
       <WeatherWidget />
+
+      {/* World Cup Countdown — most prominent feature */}
+      <WorldCupWidget />
+
+      {/* Action alerts — Paramount+ paused, upcoming renewals */}
+      <SubscriptionAlertWidget />
+
+      {/* Huel delivery countdown */}
+      <HuelCountdown />
 
       {/* Spotify */}
       <SpotifyWidget />
