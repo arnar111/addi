@@ -1,16 +1,22 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Flame, ShoppingCart } from 'lucide-react'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/habits', icon: Flame, label: 'Vanir' },
+  { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
 ]
 
 export default function Sidebar() {
+  const [name] = useLocalStorage('addi_name', 'Arnar')
+  const [city] = useLocalStorage('addi_city', 'Reykjavík')
+
   return (
     <aside className="hidden md:flex flex-col w-56 shrink-0 h-screen sticky top-0 py-6 px-3"
            style={{ borderRight: '1px solid var(--border)', background: 'rgba(10,14,26,0.98)' }}>
@@ -42,7 +48,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        {name} · {city}
       </div>
     </aside>
   )
