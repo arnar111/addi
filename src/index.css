@@ -147,3 +147,37 @@ input[type="range"] {
 /* Number input remove arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Card hover effect */
+.card:has(button:hover) { border-color: var(--border); }
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Focus visible */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Selection color */
+::selection { background: rgba(0,212,170,0.25); }
+
+/* Prevent text selection on buttons */
+button { user-select: none; }
+
+/* Tabbar safe area for iPhone 16 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 12px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fadeIn 0.2s ease; }
