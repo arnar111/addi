@@ -1,5 +1,6 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Smartphone, Trophy } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +8,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,8 +34,30 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík (64.13°N, 21.90°W)</p>
         </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="card flex flex-col gap-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Trophy size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Flýtileiðir</span>
+        </div>
+        <Link to="/sports" className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--surface2)', textDecoration: 'none' }}>
+          <span className="text-xl">🏆</span>
+          <div>
+            <div className="text-sm font-semibold">World Cup 2026</div>
+            <div className="text-xs" style={{ color: 'var(--muted)' }}>Smelltu hér til að sjá niðurtalningu</div>
+          </div>
+        </Link>
+        <Link to="/finance" className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--surface2)', textDecoration: 'none' }}>
+          <span className="text-xl">📱</span>
+          <div>
+            <div className="text-sm font-semibold">Áskriftir</div>
+            <div className="text-xs" style={{ color: 'var(--muted)' }}>Spotify, The Athletic, GOLF+ og fleiri</div>
+          </div>
+        </Link>
       </div>
 
       {/* App info */}
@@ -45,7 +68,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,14 +79,20 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <div className="text-xs p-3 rounded-xl" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+          Addi v2 · Persónulegt app fyrir Arnar Kjartansson · Reykjavík 🇮🇸
+        </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá</span>
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          <strong>iPhone:</strong> Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.<br />
+          <strong>Android:</strong> Veldu "Bæta við heimaskjá" úr Chrome valmynd.
         </p>
       </div>
 
@@ -73,7 +102,9 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
