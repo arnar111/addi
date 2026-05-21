@@ -9,6 +9,7 @@ import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
 import AuroraWidget from '../components/widgets/AuroraWidget'
 import CurrencyWidget from '../components/widgets/CurrencyWidget'
+import QuickLinksWidget from '../components/widgets/QuickLinksWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -51,6 +52,9 @@ export default function Dashboard() {
 
       {/* Currency rates */}
       <CurrencyWidget />
+
+      {/* Quick links */}
+      <QuickLinksWidget />
 
       {/* Quick note */}
       <QuickNoteWidget />
