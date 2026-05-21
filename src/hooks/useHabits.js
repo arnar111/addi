@@ -5,9 +5,11 @@ const todayStr = () => new Date().toISOString().split('T')[0]
 export function useHabits() {
   const [habits, setHabits] = useLocalStorage('addi_habits', [
     { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+    { id: '2', name: 'Lesa 20 mín', icon: '📚', color: '#8b5cf6', completions: [] },
+    { id: '3', name: 'Drekka 2L vatn', icon: '💧', color: '#3b82f6', completions: [] },
+    { id: '4', name: 'Hugleiðsla', icon: '🧘', color: '#f97316', completions: [] },
+    { id: '5', name: 'Ganga út', icon: '🚶', color: '#22c55e', completions: [] },
+    { id: '6', name: 'Sofa 7+ klst', icon: '😴', color: '#ec4899', completions: [] },
   ])
 
   const toggle = (id) => {
@@ -43,7 +45,7 @@ export function useHabits() {
 
   const streakFor = (id) => {
     const h = habits.find(h => h.id === id)
-    if (!h) return 0
+    if (!h || h.completions.length === 0) return 0
     let streak = 0
     const d = new Date()
     while (true) {
