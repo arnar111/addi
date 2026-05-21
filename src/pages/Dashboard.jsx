@@ -6,6 +6,8 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
+import QuickLinksWidget from '../components/widgets/QuickLinksWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -27,8 +29,14 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Quick links */}
+      <QuickLinksWidget />
+
       {/* Weather */}
       <WeatherWidget />
+
+      {/* World Cup 2026 */}
+      <WorldCupWidget />
 
       {/* Spotify */}
       <SpotifyWidget />

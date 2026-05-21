@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, CreditCard, AlertCircle } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -20,6 +21,122 @@ function CategoryBar({ cat, spent, budget }) {
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
+    </div>
+  )
+}
+
+function SubscriptionsTab() {
+  const { subs, toggle, remove, add, monthlyTotal, annualTotal, savingsByPausing } = useSubscriptions()
+  const [showAdd, setShowAdd] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newAmount, setNewAmount] = useState('')
+  const [newIcon, setNewIcon] = useState('📱')
+
+  const handleAdd = (e) => {
+    e.preventDefault()
+    if (!newName.trim() || !newAmount) return
+    add({
+      name: newName.trim(),
+      icon: newIcon,
+      amount: Number(newAmount),
+      currency: 'ISK',
+      active: true,
+      billingDay: 1,
+      category: 'other',
+    })
+    setNewName('')
+    setNewAmount('')
+    setShowAdd(false)
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Summary */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegar áskriftir</div>
+            <div className="text-2xl font-bold">{formatShortISK(monthlyTotal)}</div>
+          </div>
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Á ári</div>
+            <div className="text-2xl font-bold">{formatShortISK(annualTotal)}</div>
+          </div>
+        </div>
+        {savingsByPausing > 0 && (
+          <div className="mt-3 p-2.5 rounded-xl flex items-center gap-2"
+               style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
+            <AlertCircle size={14} style={{ color: 'var(--success)', shrink: 0 }} />
+            <p className="text-xs" style={{ color: 'var(--success)' }}>
+              Sparar <strong>{formatShortISK(savingsByPausing)}/mán</strong> með hlé/óvirkar áskriftir
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Add button */}
+      <button onClick={() => setShowAdd(!showAdd)} className="btn btn-primary w-full justify-center">
+        <Plus size={16} /> Bæta við áskrift
+      </button>
+
+      {showAdd && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-sm">Ný áskrift</span>
+            <button type="button" onClick={() => setShowAdd(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex gap-2">
+            <input className="input text-sm w-12 text-center shrink-0" maxLength={2}
+                   value={newIcon} onChange={e => setNewIcon(e.target.value)} />
+            <input className="input text-sm flex-1" placeholder="Nafn (t.d. Netflix)" required
+                   value={newName} onChange={e => setNewName(e.target.value)} />
+          </div>
+          <input className="input text-sm" type="number" placeholder="Upphæð á mánuði (ISK)"
+                 value={newAmount} onChange={e => setNewAmount(e.target.value)} />
+          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+        </form>
+      )}
+
+      {/* Subscriptions list */}
+      <div className="flex flex-col gap-2">
+        {subs.map(s => (
+          <div key={s.id} className="card flex items-center gap-3 py-3"
+               style={{ opacity: s.active ? 1 : 0.6 }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                 style={{ background: s.active ? 'rgba(0,212,170,0.1)' : 'var(--surface2)' }}>
+              {s.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-medium">{s.name}</span>
+                {!s.active && s.note && (
+                  <span className="badge text-[10px]"
+                        style={{ background: 'rgba(239,68,68,0.12)', color: 'var(--danger)' }}>
+                    {s.note}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+                {s.active ? formatShortISK(s.amount) + '/mán' : 'Óvirkt'}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => toggle(s.id)}
+                className="text-xs px-2.5 py-1 rounded-lg font-medium transition-all"
+                style={{
+                  background: s.active ? 'rgba(0,212,170,0.12)' : 'var(--surface2)',
+                  color: s.active ? 'var(--accent)' : 'var(--muted)',
+                }}>
+                {s.active ? 'Virkt' : 'Hlé'}
+              </button>
+              <button onClick={() => remove(s.id)} style={{ color: 'var(--muted)' }}>
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -57,34 +174,38 @@ export default function Finance() {
             {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
-          <Plus size={16} /> Gjald
-        </button>
+        {tab !== 'subscriptions' && (
+          <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
+            <Plus size={16} /> Gjald
+          </button>
+        )}
       </div>
 
       {/* Overview card */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
-            <div className="text-3xl font-semibold">{formatISK(total)}</div>
-          </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
-            <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-              {isOver ? '-' : ''}{formatISK(Math.abs(left))}
+      {tab !== 'subscriptions' && (
+        <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
+              <div className="text-3xl font-semibold">{formatISK(total)}</div>
+            </div>
+            <div className="flex flex-col items-end">
+              <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
+              <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+                {isOver ? '-' : ''}{formatISK(Math.abs(left))}
+              </div>
             </div>
           </div>
+          <div className="h-2.5 rounded-full overflow-hidden mb-1" style={{ background: 'var(--surface2)' }}>
+            <div className="h-full rounded-full transition-all"
+                 style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
+          </div>
+          <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
+            <span>{pct}% notað</span>
+            <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
+          </div>
         </div>
-        <div className="h-2.5 rounded-full overflow-hidden mb-1" style={{ background: 'var(--surface2)' }}>
-          <div className="h-full rounded-full transition-all"
-               style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
-        </div>
-        <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
-          <span>{pct}% notað</span>
-          <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
-        </div>
-      </div>
+      )}
 
       {/* Add expense form */}
       {showForm && (
@@ -113,10 +234,10 @@ export default function Finance() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', '📱 Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn text-sm shrink-0 flex-1 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
@@ -183,6 +304,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subscriptions' && <SubscriptionsTab />}
     </div>
   )
 }
