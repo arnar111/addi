@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Trophy } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
-  { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/sports', icon: Trophy, label: 'Íþróttir' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
 ]
 
@@ -43,7 +43,6 @@ export default function BottomNav() {
           </NavLink>
         ))}
       </div>
-      {/* iPhone home-indicator safe area */}
       <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
     </nav>
   )

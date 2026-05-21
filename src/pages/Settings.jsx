@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { Link } from 'react-router-dom'
-import { User, MapPin, Trash2, Info, Timer, Download, Upload, ShoppingCart } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Timer, Download, Upload, ShoppingCart, Trophy } from 'lucide-react'
 
-const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_name', 'addi_city']
+const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_subscriptions', 'addi_name', 'addi_city']
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -65,6 +65,9 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Veðurstaður er stilltur á Reykjavík (64.13°N, 21.90°W)
+          </p>
         </div>
       </div>
 
@@ -75,7 +78,7 @@ export default function Settings() {
           <Link
             to="/timer"
             className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
-            style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--text)' }}
           >
             <Timer size={16} style={{ color: 'var(--accent)' }} />
             <span className="text-sm font-medium">Tímari</span>
@@ -83,10 +86,26 @@ export default function Settings() {
           <Link
             to="/shopping"
             className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
-            style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--text)' }}
           >
             <ShoppingCart size={16} style={{ color: 'var(--accent)' }} />
             <span className="text-sm font-medium">Innkaup</span>
+          </Link>
+          <Link
+            to="/sports"
+            className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--text)' }}
+          >
+            <Trophy size={16} style={{ color: 'var(--accent)' }} />
+            <span className="text-sm font-medium">Íþróttir</span>
+          </Link>
+          <Link
+            to="/sports"
+            className="flex items-center gap-2.5 p-3 rounded-xl transition-all"
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--text)' }}
+          >
+            <span style={{ fontSize: 16 }}>🏆</span>
+            <span className="text-sm font-medium">HM 2026</span>
           </Link>
         </div>
       </div>
@@ -110,13 +129,16 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <div className="text-xs p-3 rounded-xl" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+          Addi v2 · Persónulegt app fyrir Arnar Kjartansson · Reykjavík 🇮🇸
+        </div>
       </div>
 
       {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</span>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Safari → <strong style={{ color: 'var(--text)' }}>Deila</strong> → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong> til að nota Addi eins og native app með fulla skjástærð.
+          Á iPhone: Safari → <strong style={{ color: 'var(--text)' }}>Deila</strong> → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong> til að nota Addi eins og native app.
         </p>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
           Á Android: Chrome → þriggja punkta valmynd → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong>.

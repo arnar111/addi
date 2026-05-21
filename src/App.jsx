@@ -10,6 +10,7 @@ import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
 import Shopping from './pages/Shopping'
+import Sports from './pages/Sports'
 
 const pageAnim = {
   initial: { opacity: 0, y: 8 },
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/timer" element={<Timer />} />
                 <Route path="/shopping" element={<Shopping />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/sports" element={<Sports />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

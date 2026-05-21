@@ -132,6 +132,11 @@ html, body, #root {
 .safe-top { padding-top: env(safe-area-inset-top, 0px); }
 .pb-safe { padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Checkbox custom */
 input[type="checkbox"] {
   accent-color: var(--accent);
