@@ -1,4 +1,14 @@
-export function getGreeting(name = 'Arnar') {
+export function getName() {
+  try {
+    const stored = localStorage.getItem('addi_name')
+    return stored ? JSON.parse(stored) : 'Arnar'
+  } catch {
+    return 'Arnar'
+  }
+}
+
+export function getGreeting() {
+  const name = getName()
   const h = new Date().getHours()
   if (h < 5) return `Góða nótt, ${name}`
   if (h < 12) return `Góðan daginn, ${name}`
@@ -28,4 +38,10 @@ export function isToday(dateStr) {
 
 export function isPast(dateStr) {
   return new Date(dateStr) < new Date()
+}
+
+export function dayProgress() {
+  const now = new Date()
+  const totalSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
+  return Math.round((totalSeconds / 86400) * 100)
 }
