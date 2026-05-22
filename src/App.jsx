@@ -13,7 +13,7 @@ export default function App() {
     <div className="aurora-bg min-h-screen flex">
       <Sidebar />
 
-      <main className="flex-1 flex flex-col min-h-screen pb-20 md:pb-0">
+      <main className="flex-1 flex flex-col min-h-screen pb-20">
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
           <Routes>
             <Route path="/" element={<Dashboard />} />

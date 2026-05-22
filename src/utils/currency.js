@@ -12,6 +12,14 @@ export function formatShortISK(amount) {
   return `${Math.round(amount)} kr`
 }
 
+export const INCOME_CATEGORIES = [
+  { id: 'lendo', label: 'Lendó', icon: '🪑', color: '#00d4aa' },
+  { id: 'salary', label: 'Takk / Laun', icon: '💼', color: '#8b5cf6' },
+  { id: 'freelance', label: 'Freelance', icon: '💻', color: '#3b82f6' },
+  { id: 'namslán', label: 'Námslan', icon: '🎓', color: '#f97316' },
+  { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
+]
+
 export const EXPENSE_CATEGORIES = [
   { id: 'food', label: 'Matur', icon: '🍽️', color: '#f97316' },
   { id: 'transport', label: 'Samgöngur', icon: '🚗', color: '#3b82f6' },
