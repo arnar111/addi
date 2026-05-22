@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Info, Trash2, ExternalLink } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,10 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = [
+      'addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget',
+      'addi_lendo_bookings', 'addi_lendo_expenses', 'addi_lendo_goal', 'addi_football',
+    ]
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +36,6 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
         </div>
       </div>
 
@@ -45,7 +47,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,6 +58,19 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Addi er persónulegt dagleg-app byggt fyrir Arnar Kjartansson.
+          Inniheldur Lendó viðskiptarakningar, fjármál, verkefni, venjur og fleira.
+        </p>
+      </div>
+
+      {/* Lendó quick link */}
+      <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(255,107,53,0.2)' }}>
+        <div className="text-sm font-semibold" style={{ color: '#ff6b35' }}>🏠 Lendó</div>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Lendó viðskiptarakningin hjálpar þér að fylgjast með tekjum, bókunum og hagnaði
+          á leigumarkaði. Mánaðarlegt mark: 200.000 kr.
+        </p>
       </div>
 
       {/* PWA install hint */}
@@ -73,7 +88,10 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum í appinu — verkefnum, bókunum, fjármálum og minnisblöðum.
+          Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
