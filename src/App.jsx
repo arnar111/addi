@@ -7,6 +7,8 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Subscriptions from './pages/Subscriptions'
+import Football from './pages/Football'
 
 export default function App() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/subs" element={<Subscriptions />} />
+            <Route path="/football" element={<Football />} />
           </Routes>
         </div>
       </main>
