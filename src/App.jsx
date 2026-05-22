@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { SidebarProvider } from './context/SidebarContext'
 import Sidebar from './components/Sidebar'
 import BottomNav from './components/BottomNav'
 import Dashboard from './pages/Dashboard'
@@ -7,26 +8,34 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Habits from './pages/Habits'
+import Subscriptions from './pages/Subscriptions'
+import Shopping from './pages/Shopping'
 
 export default function App() {
   return (
-    <div className="aurora-bg min-h-screen flex">
-      <Sidebar />
+    <SidebarProvider>
+      <div className="aurora-bg min-h-screen flex">
+        <Sidebar />
 
-      <main className="flex-1 flex flex-col min-h-screen pb-20 md:pb-0">
-        <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/finance" element={<Finance />} />
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/timer" element={<Timer />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </div>
-      </main>
+        <main className="flex-1 flex flex-col min-h-screen pb-20 md:pb-0">
+          <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/finance" element={<Finance />} />
+              <Route path="/notes" element={<Notes />} />
+              <Route path="/timer" element={<Timer />} />
+              <Route path="/habits" element={<Habits />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/shopping" element={<Shopping />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </div>
+        </main>
 
-      <BottomNav />
-    </div>
+        <BottomNav />
+      </div>
+    </SidebarProvider>
   )
 }

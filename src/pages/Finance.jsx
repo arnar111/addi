@@ -1,7 +1,61 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, BarChart2 } from 'lucide-react'
+
+function MonthlyChart({ expenses }) {
+  const months = []
+  const now = new Date()
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const total = expenses
+      .filter(e => {
+        const ed = new Date(e.date)
+        return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear()
+      })
+      .reduce((s, e) => s + e.amount, 0)
+    months.push({
+      label: d.toLocaleDateString('is-IS', { month: 'short' }),
+      total,
+      isNow: i === 0,
+    })
+  }
+  const max = Math.max(...months.map(m => m.total), 1)
+
+  return (
+    <div className="card">
+      <div className="flex items-center gap-2 mb-4">
+        <BarChart2 size={15} style={{ color: 'var(--accent)' }} />
+        <span className="font-semibold text-sm">Útgjöld síðustu 6 mánuðum</span>
+      </div>
+      <div className="flex items-end gap-2" style={{ height: 100 }}>
+        {months.map((m, i) => {
+          const h = Math.max(4, (m.total / max) * 88)
+          return (
+            <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              {m.total > 0 && (
+                <div className="text-center" style={{ fontSize: 9, color: m.isNow ? 'var(--accent)' : 'var(--muted)' }}>
+                  {formatShortISK(m.total)}
+                </div>
+              )}
+              <div className="w-full rounded-t-lg flex-1 flex items-end">
+                <div className="w-full rounded-t-lg transition-all duration-700"
+                     style={{
+                       height: m.total > 0 ? `${h}px` : '4px',
+                       background: m.isNow ? 'var(--accent)' : 'var(--surface2)',
+                       border: m.isNow ? '1px solid rgba(0,212,170,0.4)' : '1px solid transparent',
+                     }} />
+              </div>
+              <span style={{ fontSize: 10, color: m.isNow ? 'var(--accent)' : 'var(--muted)', fontWeight: m.isNow ? 600 : 400 }}>
+                {m.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -25,7 +79,7 @@ function CategoryBar({ cat, spent, budget }) {
 }
 
 export default function Finance() {
-  const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses, expenses } = useFinance()
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
@@ -114,7 +168,7 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['chart', 'Graf']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
@@ -182,6 +236,10 @@ export default function Finance() {
             )
           })}
         </div>
+      )}
+
+      {tab === 'chart' && (
+        <MonthlyChart expenses={expenses} />
       )}
     </div>
   )
