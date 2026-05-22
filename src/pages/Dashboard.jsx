@@ -4,8 +4,8 @@ import WeatherWidget from '../components/widgets/WeatherWidget'
 import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
-import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
-import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -30,8 +30,11 @@ export default function Dashboard() {
       {/* Weather */}
       <WeatherWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* World Cup countdown */}
+      <WorldCupWidget />
+
+      {/* Lendó rental tracker */}
+      <LendoWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -41,9 +44,6 @@ export default function Dashboard() {
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
-
-      {/* Quick note */}
-      <QuickNoteWidget />
     </div>
   )
 }
