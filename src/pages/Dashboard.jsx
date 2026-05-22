@@ -6,19 +6,22 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
-import ShoppingWidget from '../components/widgets/ShoppingWidget'
-import RatesWidget from '../components/widgets/RatesWidget'
-import WorldCupWidget from '../components/widgets/WorldCupWidget'
-import SportsWidget from '../components/widgets/SportsWidget'
-import SubscriptionsWidget from '../components/widgets/SubscriptionsWidget'
-import QuickLinksWidget from '../components/widgets/QuickLinksWidget'
-import { useSubscriptions } from '../hooks/useSubscriptions'
-import { useLocalStorage } from '../hooks/useLocalStorage'
+import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidget'
+import FootballWidget from '../components/widgets/FootballWidget'
+
+const QUICK_LINKS = [
+  { name: 'The Athletic', url: 'https://theathletic.com', icon: '📰' },
+  { name: 'Alfred.is', url: 'https://alfred.is', icon: '💼' },
+  { name: 'r/ClaudeAI', url: 'https://reddit.com/r/ClaudeAI', icon: '🤖' },
+  { name: 'Kringlan', url: 'https://kringlan.is', icon: '🛍️' },
+  { name: 'Netlify', url: 'https://app.netlify.com', icon: '🚀' },
+  { name: 'GitHub', url: 'https://github.com/arnar111', icon: '🐙' },
+  { name: 'Coursera', url: 'https://coursera.org', icon: '🎓' },
+  { name: 'BBC Sport', url: 'https://bbc.com/sport/football', icon: '⚽' },
+]
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
-  const [name] = useLocalStorage('addi_name', 'Arnar')
-  const { failedSubs } = useSubscriptions()
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 30000)
@@ -26,50 +29,50 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      {/* Greeting */}
+    <div className="flex flex-col gap-4 pb-4 animate-slide-up">
+      {/* Header */}
       <div className="px-1 pt-2">
-        <div className="text-2xl font-semibold">{getGreeting(name)}</div>
-        <div className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
-          {formatTime(time)} · {formatDate(time)}
+        <div className="text-2xl font-semibold">{getGreeting()}, Arnar 👋</div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-sm" style={{ color: 'var(--muted)' }}>
+            {formatTime(time)} · {formatDate(time)}
+          </span>
         </div>
       </div>
 
       {/* Weather */}
       <WeatherWidget />
 
-      {/* Subscription alert (only when payment issues exist) */}
-      {failedSubs.length > 0 && <SubscriptionsWidget />}
-
-      {/* Quick links */}
-      <QuickLinksWidget />
-
-      {/* World Cup Countdown */}
-      <WorldCupWidget />
-
-      {/* ISK exchange rates */}
-      <RatesWidget />
+      {/* Football + Subscription row */}
+      <FootballWidget />
+      <SubscriptionAlertWidget />
 
       {/* Spotify */}
       <SpotifyWidget />
 
-      {/* Tasks + Habits */}
+      {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
         <QuickTasksWidget />
         <HabitsWidget />
       </div>
 
-      {/* Football scores */}
-      <SportsWidget />
+      {/* Finance snapshot */}
+      <FinanceSnapshotWidget />
 
-      {/* Finance + Subscriptions */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <FinanceSnapshotWidget />
-        {failedSubs.length === 0 && <SubscriptionsWidget />}
+      {/* Quick Links */}
+      <div className="card flex flex-col gap-3">
+        <h3 className="font-semibold text-sm" style={{ color: 'var(--muted)' }}>Flýtileiðir</h3>
+        <div className="grid grid-cols-4 gap-2">
+          {QUICK_LINKS.map(link => (
+            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer"
+               className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
+               style={{ background: 'var(--surface2)', textDecoration: 'none' }}>
+              <span className="text-xl">{link.icon}</span>
+              <span style={{ color: 'var(--muted)', fontSize: 9, textAlign: 'center', lineHeight: 1.2 }}>{link.name}</span>
+            </a>
+          ))}
+        </div>
       </div>
-
-      {/* Shopping list */}
-      <ShoppingWidget />
 
       {/* Quick note */}
       <QuickNoteWidget />

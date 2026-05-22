@@ -1,244 +1,267 @@
 import { useState } from 'react'
-import { useSubscriptions, SUB_STATUSES, POPULAR_SUBS } from '../hooks/useSubscriptions'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK } from '../utils/currency'
-import { Plus, Trash2, X, ExternalLink, AlertTriangle, Edit2, Check, TrendingDown, ChevronDown } from 'lucide-react'
+import { Plus, X, AlertCircle, CheckCircle, XCircle, ChevronDown, Trash2 } from 'lucide-react'
 
-const BILLING_CYCLES = [['monthly', 'Mánaðarlegt'], ['yearly', 'Árlegt']]
+const STATUS_CONFIG = {
+  active:    { label: 'Virk',       color: 'var(--success)',  icon: CheckCircle,   bg: 'rgba(34,197,94,0.12)'  },
+  failing:   { label: 'Vandamál',   color: 'var(--danger)',   icon: AlertCircle,   bg: 'rgba(239,68,68,0.12)'  },
+  cancelled: { label: 'Hætt við',   color: 'var(--muted)',    icon: XCircle,       bg: 'rgba(100,116,139,0.12)' },
+}
 
-function SubCard({ sub, onRemove, onUpdate }) {
-  const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState({ ...sub })
-  const status = SUB_STATUSES[sub.status] || SUB_STATUSES.active
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'ISK']
+const PERIODS = [['monthly', 'Mánaðarlegt'], ['yearly', 'Árlegt']]
+const CATEGORY_ICONS = {
+  'Afþreying': '🎬', 'AI': '🤖', 'Nám': '📚', 'Hugbúnaður': '🖥️',
+  'Þróun': '🚀', 'Leikir': '🎮', 'Heilsa': '💪', 'Annað': '📦',
+}
+const CATEGORIES = Object.keys(CATEGORY_ICONS)
 
-  const save = () => {
-    onUpdate(sub.id, form)
-    setEditing(false)
-  }
+function StatusBadge({ status }) {
+  const cfg = STATUS_CONFIG[status]
+  const Icon = cfg.icon
+  return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
+          style={{ background: cfg.bg, color: cfg.color }}>
+      <Icon size={10} />
+      {cfg.label}
+    </span>
+  )
+}
 
-  if (editing) {
-    return (
-      <div className="card flex flex-col gap-3 animate-slide-up" style={{ border: '1px solid rgba(0,212,170,0.3)' }}>
-        <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Breyta</span>
-          <button onClick={() => setEditing(false)}><X size={15} style={{ color: 'var(--muted)' }} /></button>
-        </div>
-        <input className="input text-sm" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nafn" />
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs" style={{ color: 'var(--muted)' }}>Upphæð (ISK/mán)</label>
-            <input className="input text-sm" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs" style={{ color: 'var(--muted)' }}>Staða</label>
-            <select className="input text-sm" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
-              {Object.entries(SUB_STATUSES).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
-            </select>
-          </div>
-          <div className="flex flex-col gap-1 col-span-2">
-            <label className="text-xs" style={{ color: 'var(--muted)' }}>Næsta greiðsla</label>
-            <input type="date" className="input text-sm" value={form.nextBilling || ''} onChange={e => setForm(f => ({ ...f, nextBilling: e.target.value || null }))} />
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={save} className="btn btn-primary flex-1 justify-center text-sm"><Check size={14} /> Vista</button>
-          <button onClick={() => setEditing(false)} className="btn btn-ghost px-3"><X size={14} /></button>
-        </div>
-      </div>
-    )
-  }
+function SubCard({ sub, toMonthlyISK, setStatus, remove }) {
+  const [open, setOpen] = useState(false)
+  const isk = toMonthlyISK(sub)
+  const cfg = STATUS_CONFIG[sub.status]
 
   return (
-    <div className="card flex items-center gap-3 py-3"
-         style={{
-           borderColor: sub.status === 'failed' ? 'rgba(239,68,68,0.3)' :
-                        sub.status === 'paused' ? 'rgba(249,115,22,0.2)' : 'var(--border)',
-           background: sub.status === 'failed' ? 'rgba(239,68,68,0.03)' : 'var(--surface)',
-         }}>
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg"
-           style={{ background: `${sub.color}22` }}>
-        {sub.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium truncate">{sub.name}</span>
-          {sub.status === 'failed' && <AlertTriangle size={12} style={{ color: 'var(--danger)', flexShrink: 0 }} />}
+    <div className="card flex flex-col gap-0 overflow-hidden"
+         style={{ borderColor: sub.status === 'failing' ? 'rgba(239,68,68,0.3)' : 'var(--border)', padding: 0 }}>
+      <button className="flex items-center gap-3 p-4 w-full text-left" onClick={() => setOpen(o => !o)}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
+             style={{ background: `${sub.color}22` }}>
+          {sub.icon}
         </div>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-sm font-semibold" style={{ color: sub.status === 'active' ? 'var(--text)' : 'var(--muted)' }}>
-            {formatShortISK(sub.amount)}/mán
-          </span>
-          {sub.status !== 'active' && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full"
-                  style={{ background: `${status.color}20`, color: status.color }}>
-              {status.label}
-            </span>
-          )}
-        </div>
-        {sub.nextBilling && sub.status === 'active' && (
-          <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-            Næst: {new Date(sub.nextBilling).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-sm">{sub.name}</span>
+            <StatusBadge status={sub.status} />
           </div>
-        )}
-      </div>
-      <div className="flex items-center gap-1 shrink-0">
-        <button onClick={() => setEditing(true)} className="p-1.5 rounded-lg hover:bg-[var(--surface2)]">
-          <Edit2 size={13} style={{ color: 'var(--muted)' }} />
-        </button>
-        <button onClick={() => onRemove(sub.id)} className="p-1.5 rounded-lg hover:bg-[rgba(239,68,68,0.1)]">
-          <Trash2 size={13} style={{ color: 'var(--muted)' }} />
-        </button>
-      </div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+            {sub.category} · {sub.period === 'yearly' ? 'Árlegt' : 'Mánaðarlegt'}
+          </div>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="text-sm font-semibold">{formatShortISK(isk)}<span className="text-xs font-normal" style={{ color: 'var(--muted)' }}>/mán</span></div>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>
+            {sub.amount} {sub.currency}
+          </div>
+        </div>
+        <ChevronDown size={14} style={{ color: 'var(--muted)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </button>
+
+      {open && (
+        <div className="flex flex-col gap-2 px-4 pb-4 pt-0 animate-slide-up" style={{ borderTop: '1px solid var(--border)' }}>
+          <div className="text-xs mt-3 mb-1 font-medium" style={{ color: 'var(--muted)' }}>Breyta stöðu</div>
+          <div className="flex gap-2 flex-wrap">
+            {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
+              <button key={s} onClick={() => setStatus(sub.id, s)}
+                className="btn text-xs py-1.5 px-3"
+                style={{
+                  background: sub.status === s ? cfg.bg : 'var(--surface2)',
+                  color: sub.status === s ? cfg.color : 'var(--muted)',
+                  border: `1px solid ${sub.status === s ? cfg.color + '44' : 'transparent'}`,
+                }}>
+                {cfg.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => remove(sub.id)}
+                  className="btn text-xs py-1.5 mt-1 justify-center"
+                  style={{ background: 'rgba(239,68,68,0.08)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <Trash2 size={12} /> Eyða áskrift
+          </button>
+        </div>
+      )}
     </div>
   )
 }
 
-const EMPTY_FORM = { name: '', icon: '💳', color: '#00d4aa', amount: 1990, status: 'active', nextBilling: '' }
-
 export default function Subscriptions() {
-  const { subs, add, remove, update, monthlyTotal, yearlyTotal, failedSubs } = useSubscriptions()
-  const [tab, setTab] = useState('all')
+  const { subs, failing, active, cancelled, monthlyISK, failingISK, toMonthlyISK, setStatus, add, remove } = useSubscriptions()
   const [showForm, setShowForm] = useState(false)
-  const [showPopular, setShowPopular] = useState(false)
-  const [form, setForm] = useState(EMPTY_FORM)
-
-  const filtered = tab === 'active' ? subs.filter(s => s.status === 'active')
-    : tab === 'issues' ? subs.filter(s => s.status === 'failed' || s.status === 'paused')
-    : subs.filter(s => s.status !== 'cancelled')
+  const [tab, setTab] = useState('all')
+  const [form, setForm] = useState({ name: '', icon: '📱', amount: '', currency: 'USD', period: 'monthly', status: 'active', category: 'Annað', color: '#00d4aa', renewDay: 1 })
 
   const handleAdd = (e) => {
     e.preventDefault()
-    if (!form.name.trim()) return
-    add({ ...form, nextBilling: form.nextBilling || null })
-    setForm(EMPTY_FORM)
+    if (!form.name || !form.amount) return
+    add({ ...form, amount: Number(form.amount) })
+    setForm({ name: '', icon: '📱', amount: '', currency: 'USD', period: 'monthly', status: 'active', category: 'Annað', color: '#00d4aa', renewDay: 1 })
     setShowForm(false)
   }
 
-  const addPopular = (p) => {
-    add({ name: p.name, icon: p.icon, amount: p.amount, color: p.color })
-    setShowPopular(false)
-  }
+  const displayed = tab === 'failing' ? failing : tab === 'active' ? active : tab === 'cancelled' ? cancelled : subs
+  const yearlyISK = monthlyISK * 12
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="flex items-center justify-between px-1 pt-2">
         <div>
           <h1 className="text-xl font-semibold">Áskriftir</h1>
-          <p className="text-sm" style={{ color: 'var(--muted)' }}>
-            {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
-          </p>
+          <p className="text-sm" style={{ color: 'var(--muted)' }}>{subs.filter(s => s.status !== 'cancelled').length} virkar · {formatShortISK(monthlyISK)}/mán</p>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
           <Plus size={16} /> Bæta við
         </button>
       </div>
 
-      {/* Summary */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegur kostnaður</div>
-            <div className="text-3xl font-semibold">{formatISK(monthlyTotal)}</div>
-            <div className="text-xs mt-1" style={{ color: 'var(--muted)' }}>{formatISK(yearlyTotal)} á ári</div>
-          </div>
-          {failedSubs.length > 0 && (
-            <button onClick={() => setTab('issues')}
-                    className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1 text-sm font-semibold" style={{ color: 'var(--danger)' }}>
-                <AlertTriangle size={14} />
-                {failedSubs.length} greiðsluvandamál
-              </div>
-              <span className="text-xs" style={{ color: 'var(--danger)' }}>Skoða →</span>
-            </button>
-          )}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="card-sm flex flex-col gap-0.5" style={{ textAlign: 'center' }}>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Á mánuði</div>
+          <div className="text-base font-bold" style={{ color: 'var(--accent)' }}>{formatShortISK(monthlyISK)}</div>
         </div>
-        {failedSubs.length > 0 && (
-          <div className="mt-3 p-2.5 rounded-xl flex items-start gap-2"
-               style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
-            <TrendingDown size={14} style={{ color: 'var(--danger)', marginTop: 1, flexShrink: 0 }} />
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--danger)' }}>
-              Greiðslumál hjá: <strong>{failedSubs.map(s => s.name).join(', ')}</strong>. Uppfærðu greiðsluupplýsingar.
-            </p>
+        <div className="card-sm flex flex-col gap-0.5" style={{ textAlign: 'center' }}>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Á ári</div>
+          <div className="text-base font-bold">{formatShortISK(yearlyISK)}</div>
+        </div>
+        <div className="card-sm flex flex-col gap-0.5" style={{ textAlign: 'center' }}>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Vandamál</div>
+          <div className="text-base font-bold" style={{ color: failing.length > 0 ? 'var(--danger)' : 'var(--success)' }}>
+            {failing.length}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Add form */}
-      {showForm && (
-        <div className="card flex flex-col gap-3 animate-slide-up" style={{ border: '1px solid rgba(0,212,170,0.25)' }}>
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Ný áskrift</h3>
-            <button onClick={() => setShowForm(false)}><X size={15} style={{ color: 'var(--muted)' }} /></button>
+      {failing.length > 0 && (
+        <div className="card flex items-start gap-3 animate-slide-up"
+             style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)' }}>
+          <AlertCircle size={18} style={{ color: 'var(--danger)', shrink: 0, marginTop: 2 }} />
+          <div>
+            <div className="text-sm font-semibold" style={{ color: 'var(--danger)' }}>
+              {failing.length} áskrift með greiðsluvandamál
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+              {formatShortISK(failingISK)}/mán í hættu · Uppfærðu greiðslumáta
+            </div>
           </div>
-
-          <button onClick={() => setShowPopular(!showPopular)}
-                  className="btn btn-ghost text-xs w-full justify-between">
-            <span>Veldu vinsæla áskrift</span>
-            <ChevronDown size={14} style={{ transform: showPopular ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
-          </button>
-
-          {showPopular && (
-            <div className="grid grid-cols-3 gap-1.5 max-h-36 overflow-y-auto">
-              {POPULAR_SUBS.map(p => (
-                <button key={p.name} onClick={() => addPopular(p)}
-                  className="flex flex-col items-center gap-1 p-2 rounded-xl text-xs text-center transition-all hover:scale-105"
-                  style={{ background: 'var(--surface2)' }}>
-                  <span className="text-lg">{p.icon}</span>
-                  <span style={{ color: 'var(--muted)', fontSize: 9 }}>{p.name.split(' ')[0]}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleAdd} className="flex flex-col gap-2">
-            <input className="input text-sm" placeholder="Nafn áskriftar" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} autoFocus required />
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs" style={{ color: 'var(--muted)' }}>Upphæð (ISK/mán)</label>
-                <input className="input text-sm" type="number" min="0" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs" style={{ color: 'var(--muted)' }}>Staða</label>
-                <select className="input text-sm" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
-                  {Object.entries(SUB_STATUSES).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
-                </select>
-              </div>
-            </div>
-            <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
-          </form>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex gap-2">
-        {[['all', 'Allar'], ['active', 'Virkar'], ['issues', 'Vandamál']].map(([t, l]) => (
+      {showForm && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Ný áskrift</h3>
+            <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex gap-2">
+            <input className="input text-sm" style={{ width: 52, textAlign: 'center', padding: '10px 4px', flexShrink: 0 }}
+              placeholder="📱" value={form.icon} onChange={e => setForm(f => ({ ...f, icon: e.target.value }))} maxLength={2} />
+            <input className="input text-sm flex-1" placeholder="Nafn á áskrift" value={form.name}
+              onChange={e => setForm(f => ({ ...f, name: e.target.value }))} autoFocus />
+          </div>
+          <div className="flex gap-2">
+            <input className="input text-sm flex-1" type="number" placeholder="Upphæð" value={form.amount}
+              onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+            <select className="input text-sm" style={{ width: 80, flexShrink: 0 }} value={form.currency}
+              onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+              {CURRENCIES.map(c => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="flex gap-2">
+            {PERIODS.map(([val, lbl]) => (
+              <button key={val} type="button" onClick={() => setForm(f => ({ ...f, period: val }))}
+                className="btn flex-1 text-xs py-2 justify-center"
+                style={{
+                  background: form.period === val ? 'rgba(0,212,170,0.12)' : 'var(--surface2)',
+                  color: form.period === val ? 'var(--accent)' : 'var(--muted)',
+                  border: `1px solid ${form.period === val ? 'rgba(0,212,170,0.3)' : 'transparent'}`,
+                }}>{lbl}</button>
+            ))}
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {CATEGORIES.map(cat => (
+              <button key={cat} type="button" onClick={() => setForm(f => ({ ...f, category: cat }))}
+                className="flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs transition-all"
+                style={{
+                  background: form.category === cat ? 'rgba(0,212,170,0.12)' : 'var(--surface2)',
+                  border: `1px solid ${form.category === cat ? 'rgba(0,212,170,0.3)' : 'transparent'}`,
+                }}>
+                <span>{CATEGORY_ICONS[cat]}</span>
+                <span style={{ color: form.category === cat ? 'var(--accent)' : 'var(--muted)', fontSize: 9 }}>{cat}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
+              <button key={s} type="button" onClick={() => setForm(f => ({ ...f, status: s }))}
+                className="btn flex-1 text-xs py-1.5 justify-center"
+                style={{
+                  background: form.status === s ? cfg.bg : 'var(--surface2)',
+                  color: form.status === s ? cfg.color : 'var(--muted)',
+                  border: `1px solid ${form.status === s ? cfg.color + '44' : 'transparent'}`,
+                }}>{cfg.label}</button>
+            ))}
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við áskrift</button>
+        </form>
+      )}
+
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {[
+          ['all', `Allt (${subs.length})`],
+          ['failing', `⚠️ Vandamál (${failing.length})`],
+          ['active', `✓ Virkar (${active.length})`],
+          ['cancelled', `Hætt (${cancelled.length})`],
+        ].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn shrink-0 text-xs py-1.5"
             style={{
-              background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
+              background: tab === t ? 'rgba(0,212,170,0.15)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
-              border: `1px solid ${tab === t ? 'rgba(0,212,170,0.25)' : 'var(--border)'}`,
-            }}>
-            {l}
-            {t === 'issues' && failedSubs.length > 0 && (
-              <span className="w-4 h-4 rounded-full text-xs flex items-center justify-center ml-1"
-                    style={{ background: 'var(--danger)', color: '#fff', fontSize: 9 }}>
-                {failedSubs.length}
-              </span>
-            )}
-          </button>
+              border: `1px solid ${tab === t ? 'rgba(0,212,170,0.3)' : 'var(--border)'}`,
+            }}>{l}</button>
         ))}
       </div>
 
-      {/* List */}
       <div className="flex flex-col gap-2">
-        {filtered.length === 0 ? (
-          <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>
-            {tab === 'issues' ? 'Engin greiðsluvandamál 🎉' : 'Engar áskriftir enn'}
-          </div>
-        ) : filtered.map(s => (
-          <SubCard key={s.id} sub={s} onRemove={remove} onUpdate={update} />
-        ))}
+        {displayed.length === 0 ? (
+          <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>Engar áskriftir</div>
+        ) : (
+          displayed.map(s => (
+            <SubCard key={s.id} sub={s} toMonthlyISK={toMonthlyISK} setStatus={setStatus} remove={remove} />
+          ))
+        )}
       </div>
+
+      {subs.filter(s => s.status !== 'cancelled').length > 0 && (
+        <div className="card flex flex-col gap-3">
+          <h3 className="font-semibold text-sm">Eftir flokkum</h3>
+          {(() => {
+            const byCategory = {}
+            subs.filter(s => s.status !== 'cancelled').forEach(s => {
+              if (!byCategory[s.category]) byCategory[s.category] = 0
+              byCategory[s.category] += toMonthlyISK(s)
+            })
+            return Object.entries(byCategory)
+              .sort((a, b) => b[1] - a[1])
+              .map(([cat, isk]) => {
+                const pct = Math.round((isk / monthlyISK) * 100)
+                return (
+                  <div key={cat} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>{CATEGORY_ICONS[cat] || '📦'} {cat}</span>
+                      <span style={{ color: 'var(--muted)' }}>{formatShortISK(isk)}/mán</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+                    </div>
+                  </div>
+                )
+              })
+          })()}
+        </div>
+      )}
     </div>
   )
 }

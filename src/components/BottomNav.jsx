@@ -1,48 +1,37 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, CreditCard, FileText } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, CreditCard, Trophy } from 'lucide-react'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 
-const NAV = [
+const BASE_NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/football', icon: Trophy, label: 'Fótbolti' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/subscriptions', icon: CreditCard, label: 'Áskriftir', showBadge: true },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
+  { to: '/subs', icon: CreditCard, label: 'Áskriftir' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
 ]
 
 export default function BottomNav() {
-  const { failedSubs } = useSubscriptions()
+  const { failing } = useSubscriptions()
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
-      style={{
-        background: 'rgba(10,14,26,0.96)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid var(--border)',
-      }}
-    >
-      <div className="flex items-center justify-around px-1 pt-2">
-        {NAV.map(({ to, icon: Icon, label, showBadge }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom md:hidden"
+         style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
+      <div className="flex items-center justify-around px-2 pt-2 pb-1">
+        {BASE_NAV.map(({ to, icon: Icon, label }) => (
+          <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${
+              `flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all relative ${
                 isActive ? 'text-[var(--accent)]' : 'text-[var(--muted)]'
               }`
-            }
-          >
+            }>
             {({ isActive }) => (
               <>
-                <div className={`relative p-1.5 rounded-xl transition-all ${isActive ? 'bg-[rgba(0,212,170,0.15)]' : ''}`}>
+                <div className={`p-1.5 rounded-xl transition-all relative ${isActive ? 'bg-[rgba(0,212,170,0.15)]' : ''}`}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-                  {showBadge && failedSubs.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold"
-                          style={{ background: 'var(--danger)', color: '#fff', fontSize: 8 }}>
-                      {failedSubs.length}
+                  {to === '/subs' && failing.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white font-bold"
+                          style={{ background: 'var(--danger)', fontSize: 9 }}>
+                      {failing.length}
                     </span>
                   )}
                 </div>
@@ -52,7 +41,6 @@ export default function BottomNav() {
           </NavLink>
         ))}
       </div>
-      <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
     </nav>
   )
 }
