@@ -3,8 +3,9 @@ import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/lendo', label: 'Lendó leigur', emoji: '🪑' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
@@ -22,7 +23,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, label, emoji }) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -33,7 +34,11 @@ export default function Sidebar() {
             }>
             {({ isActive }) => (
               <>
-                <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                {emoji ? (
+                  <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>{emoji}</span>
+                ) : (
+                  <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                )}
                 {label}
               </>
             )}
@@ -42,7 +47,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Addi · Reykjavík 🇮🇸
       </div>
     </aside>
   )
