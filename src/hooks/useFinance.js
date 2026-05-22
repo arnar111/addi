@@ -2,6 +2,7 @@ import { useLocalStorage } from './useLocalStorage'
 
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [income, setIncome] = useLocalStorage('addi_income', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
     categories: {
@@ -26,9 +27,19 @@ export function useFinance() {
     }, ...prev])
   }
 
-  const removeExpense = (id) => {
-    setExpenses(prev => prev.filter(e => e.id !== id))
+  const removeExpense = (id) => setExpenses(prev => prev.filter(e => e.id !== id))
+
+  const addIncome = (amount, source, note = '') => {
+    setIncome(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source,
+      note,
+      date: new Date().toISOString(),
+    }, ...prev])
   }
+
+  const removeIncome = (id) => setIncome(prev => prev.filter(i => i.id !== id))
 
   const currentMonth = () => {
     const now = new Date()
@@ -38,25 +49,36 @@ export function useFinance() {
     })
   }
 
+  const currentMonthIncome = () => {
+    const now = new Date()
+    return income.filter(i => {
+      const d = new Date(i.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
+  const monthlyIncome = () => currentMonthIncome().reduce((s, i) => s + i.amount, 0)
+  const netBalance = () => monthlyIncome() - monthlyTotal()
 
   const byCategory = () => {
-    const m = currentMonth()
     const result = {}
-    m.forEach(e => {
+    currentMonth().forEach(e => {
       result[e.category] = (result[e.category] || 0) + e.amount
     })
     return result
   }
 
   const remaining = () => budget.monthly - monthlyTotal()
-
-  const recentExpenses = expenses.slice(0, 20)
+  const recentExpenses = expenses.slice(0, 30)
+  const recentIncome = income.slice(0, 30)
 
   return {
     expenses, addExpense, removeExpense,
+    income, addIncome, removeIncome,
     budget, setBudget,
     currentMonth, monthlyTotal, byCategory, remaining,
-    recentExpenses,
+    monthlyIncome, netBalance,
+    recentExpenses, recentIncome,
   }
 }

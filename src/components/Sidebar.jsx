@@ -1,9 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Trophy, Flame } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/habits', icon: Flame, label: 'Vanur' },
+  { to: '/sports', icon: Trophy, label: 'Íþróttir' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
@@ -42,7 +44,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Addi · Reykjavík 🇮🇸
       </div>
     </aside>
   )

@@ -7,12 +7,13 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Habits from './pages/Habits'
+import Sports from './pages/Sports'
 
 export default function App() {
   return (
     <div className="aurora-bg min-h-screen flex">
       <Sidebar />
-
       <main className="flex-1 flex flex-col min-h-screen pb-20 md:pb-0">
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
           <Routes>
@@ -22,10 +23,11 @@ export default function App() {
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/sports" element={<Sports />} />
           </Routes>
         </div>
       </main>
-
       <BottomNav />
     </div>
   )
