@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLendo } from '../hooks/useLendo'
 import { formatISK, formatShortISK } from '../utils/currency'
-import { Plus, Trash2, X, Target, TrendingUp, Package, Calendar } from 'lucide-react'
+import { Plus, Trash2, X, Target } from 'lucide-react'
 
 export default function Lendo() {
   const {
