@@ -5,7 +5,14 @@ import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
-import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
+import JobsWidget from '../components/widgets/JobsWidget'
+
+const NEWS_LINKS = [
+  { label: 'Heimildin', url: 'https://heimildin.is', flag: '🇮🇸' },
+  { label: 'The Athletic', url: 'https://theathletic.com', flag: '⚽' },
+  { label: 'Vísir', url: 'https://visir.is', flag: '📰' },
+]
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -30,8 +37,8 @@ export default function Dashboard() {
       {/* Weather */}
       <WeatherWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* World Cup countdown */}
+      <WorldCupWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -41,6 +48,24 @@ export default function Dashboard() {
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
+
+      {/* Jobs snapshot */}
+      <JobsWidget />
+
+      {/* Quick links to news */}
+      <div className="card">
+        <h3 className="font-semibold text-sm mb-3">Fréttir</h3>
+        <div className="flex gap-2 flex-wrap">
+          {NEWS_LINKS.map(n => (
+            <a key={n.label} href={n.url} target="_blank" rel="noopener noreferrer"
+               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium"
+               style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)', textDecoration: 'none' }}>
+              <span>{n.flag}</span>
+              <span>{n.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
 
       {/* Quick note */}
       <QuickNoteWidget />
