@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, AlertTriangle } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_jobs', 'addi_watchlist', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -16,6 +16,21 @@ export default function Settings() {
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="px-1 pt-2">
         <h1 className="text-xl font-semibold">Stillingar</h1>
+      </div>
+
+      {/* Netlify billing alert */}
+      <div className="card flex gap-3 items-start" style={{ border: '1px solid rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.05)' }}>
+        <AlertTriangle size={18} style={{ color: '#f97316', flexShrink: 0, marginTop: 1 }} />
+        <div>
+          <div className="text-sm font-semibold" style={{ color: '#f97316' }}>Netlify greiðsla vantar</div>
+          <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--muted)' }}>
+            Þú fékkst tölvupóst frá Netlify um greiðslukort. Verkefni verða sett í bið eftir 25 daga.
+          </p>
+          <a href="https://app.netlify.com" target="_blank" rel="noopener noreferrer"
+            className="btn text-xs py-1 mt-2 inline-flex" style={{ background: 'rgba(249,115,22,0.15)', color: '#f97316', border: '1px solid rgba(249,115,22,0.3)' }}>
+            Fara á Netlify →
+          </a>
+        </div>
       </div>
 
       {/* Profile */}
@@ -33,7 +48,6 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
         </div>
       </div>
 
@@ -45,7 +59,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -58,7 +72,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
         <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, ToggleLeft, ToggleRight } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -20,6 +21,98 @@ function CategoryBar({ cat, spent, budget }) {
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
+    </div>
+  )
+}
+
+function SubscriptionsTab() {
+  const { subs, add, toggle, remove, monthlyTotal, yearlyTotal } = useSubscriptions()
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ name: '', icon: '📱', amount: '', period: 'monthly', category: 'other' })
+
+  const handleAdd = (e) => {
+    e.preventDefault()
+    if (!form.name.trim() || !form.amount) return
+    add(form)
+    setForm({ name: '', icon: '📱', amount: '', period: 'monthly', category: 'other' })
+    setShowForm(false)
+  }
+
+  const ICONS = ['📱', '🎵', '🎬', '📰', '🎮', '🏋️', '🎓', '🏠', '💰', '⭐']
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+        <div className="flex justify-between items-center mb-1">
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegar skuldbindingar</div>
+            <div className="text-3xl font-semibold">{formatISK(monthlyTotal)}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Á ári</div>
+            <div className="text-lg font-semibold" style={{ color: 'var(--accent)' }}>{formatShortISK(yearlyTotal)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-sm">Áskriftir & Skuldbindingar</h3>
+        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary text-xs py-1.5">
+          <Plus size={13} /> Bæta við
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Ný skuldbinding</h3>
+            <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {ICONS.map(ic => (
+              <button key={ic} type="button" onClick={() => setForm(f => ({ ...f, icon: ic }))}
+                className="w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all"
+                style={{ background: form.icon === ic ? 'rgba(0,212,170,0.15)' : 'var(--surface2)', border: `1px solid ${form.icon === ic ? 'var(--accent)' : 'transparent'}` }}>
+                {ic}
+              </button>
+            ))}
+          </div>
+          <input className="input text-sm" placeholder="Heiti *" value={form.name}
+            onChange={e => setForm(f => ({ ...f, name: e.target.value }))} autoFocus />
+          <div className="flex gap-2">
+            <input className="input text-sm flex-1" type="number" placeholder="Upphæð (ISK)" value={form.amount}
+              onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+            <select className="input text-sm w-auto"
+              value={form.period} onChange={e => setForm(f => ({ ...f, period: e.target.value }))}>
+              <option value="monthly">Mánaðarlegt</option>
+              <option value="yearly">Árlegt</option>
+            </select>
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center">Vista</button>
+        </form>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {subs.map(s => (
+          <div key={s.id} className="card flex items-center gap-3 py-3"
+               style={{ opacity: s.active ? 1 : 0.5 }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0"
+                 style={{ background: 'var(--surface2)' }}>{s.icon}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate">{s.name}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                {formatISK(s.amount)}/{s.period === 'monthly' ? 'mán' : 'ár'}
+              </div>
+            </div>
+            <button onClick={() => toggle(s.id)} style={{ color: s.active ? 'var(--accent)' : 'var(--muted)' }}>
+              {s.active ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
+            </button>
+            <button onClick={() => remove(s.id)} style={{ color: 'var(--muted)' }}>
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -69,7 +162,7 @@ export default function Finance() {
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
+          <div className="flex flex-col items-end">
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
             <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
@@ -113,10 +206,10 @@ export default function Finance() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', 'Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn text-sm shrink-0 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
@@ -183,6 +276,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subscriptions' && <SubscriptionsTab />}
     </div>
   )
 }
