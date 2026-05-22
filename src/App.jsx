@@ -5,8 +5,10 @@ import Dashboard from './pages/Dashboard'
 import Tasks from './pages/Tasks'
 import Finance from './pages/Finance'
 import Notes from './pages/Notes'
-import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Lendo from './pages/Lendo'
+import WorldCup from './pages/WorldCup'
+import Thraukarinn from './pages/Thraukarinn'
 
 export default function App() {
   return (
@@ -17,10 +19,12 @@ export default function App() {
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/lendo" element={<Lendo />} />
+            <Route path="/worldcup" element={<WorldCup />} />
+            <Route path="/thraukarinn" element={<Thraukarinn />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/finance" element={<Finance />} />
             <Route path="/notes" element={<Notes />} />
-            <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
