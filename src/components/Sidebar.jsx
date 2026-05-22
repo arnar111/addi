@@ -14,11 +14,12 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-56 shrink-0 h-screen sticky top-0 py-6 px-3"
            style={{ borderRight: '1px solid var(--border)', background: 'rgba(10,14,26,0.98)' }}>
-      <div className="flex items-center gap-2 px-3 mb-8">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
+      <div className="flex items-center gap-2.5 px-3 mb-8">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
              style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto px-1.5 py-0.5 rounded-md"
+              style={{ background: 'rgba(0,212,170,0.12)', color: 'var(--accent)', fontSize: 10 }}>v2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
@@ -42,7 +43,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Reykjavík 🇮🇸
       </div>
     </aside>
   )
