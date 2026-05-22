@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, ShoppingCart, Trophy } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, ShoppingCart, Trophy, CreditCard } from 'lucide-react'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/subscriptions', icon: CreditCard, label: 'Áskriftir', showBadge: true },
   { to: '/sports', icon: Trophy, label: 'Íþróttir' },
   { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
@@ -12,6 +14,7 @@ const NAV = [
 ]
 
 export default function Sidebar() {
+  const { failedSubs } = useSubscriptions()
   return (
     <aside
       className="hidden md:flex flex-col w-56 shrink-0 h-screen sticky top-0 py-6 px-3"
@@ -27,7 +30,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, label, showBadge }) => (
           <NavLink
             key={to}
             to={to}
@@ -43,7 +46,13 @@ export default function Sidebar() {
             {({ isActive }) => (
               <>
                 <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
-                {label}
+                <span className="flex-1">{label}</span>
+                {showBadge && failedSubs.length > 0 && (
+                  <span className="w-4 h-4 rounded-full flex items-center justify-center font-bold"
+                        style={{ background: 'var(--danger)', color: '#fff', fontSize: 9 }}>
+                    {failedSubs.length}
+                  </span>
+                )}
               </>
             )}
           </NavLink>
