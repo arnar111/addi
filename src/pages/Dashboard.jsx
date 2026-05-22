@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { getGreeting, formatTime, formatDate } from '../utils/time'
 import WeatherWidget from '../components/widgets/WeatherWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
 import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
@@ -27,11 +29,14 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Weather */}
+      {/* Weather – Reykjavík */}
       <WeatherWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* Lendó – rental business income tracker */}
+      <LendoWidget />
+
+      {/* World Cup 2026 countdown */}
+      <WorldCupWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -41,6 +46,9 @@ export default function Dashboard() {
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
+
+      {/* Spotify */}
+      <SpotifyWidget />
 
       {/* Quick note */}
       <QuickNoteWidget />
