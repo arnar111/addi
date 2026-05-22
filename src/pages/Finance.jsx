@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { monthlyTotal as subMonthly, yearlyTotal as subYearly, SUB_CATEGORIES } from '../utils/subscriptions'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign, CreditCard, ToggleLeft, ToggleRight, ExternalLink, AlertTriangle } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -20,6 +22,166 @@ function CategoryBar({ cat, spent, budget }) {
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
+    </div>
+  )
+}
+
+function SubscriptionsTab() {
+  const { subs, addSub, removeSub, toggleActive } = useSubscriptions()
+  const [showForm, setShowForm] = useState(false)
+  const [newSub, setNewSub] = useState({ name: '', icon: '💳', cost: '', billing: 'monthly', category: 'other', active: true })
+  const [filterCat, setFilterCat] = useState('all')
+
+  const monthly = subMonthly(subs)
+  const yearly = subYearly(subs)
+  const warnings = subs.filter(s => s.note && s.note.includes('⚠️'))
+  const paused = subs.filter(s => !s.active)
+  const filtered = filterCat === 'all' ? subs : subs.filter(s => s.category === filterCat)
+
+  const handleAdd = (e) => {
+    e.preventDefault()
+    if (!newSub.name || !newSub.cost) return
+    addSub({ ...newSub, cost: Number(newSub.cost) })
+    setNewSub({ name: '', icon: '💳', cost: '', billing: 'monthly', category: 'other', active: true })
+    setShowForm(false)
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Summary */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(0,0,0,0))' }}>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegt</div>
+            <div className="text-2xl font-semibold">{formatISK(monthly)}</div>
+          </div>
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Á ári</div>
+            <div className="text-2xl font-semibold">{formatISK(yearly)}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-xs flex-wrap">
+          <span className="flex items-center gap-1" style={{ color: 'var(--success)' }}>
+            ✓ {subs.filter(s => s.active).length} virk áskrift
+          </span>
+          {paused.length > 0 && (
+            <span className="flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+              ⏸ {paused.length} hlé
+            </span>
+          )}
+          {warnings.length > 0 && (
+            <span className="flex items-center gap-1" style={{ color: 'var(--danger)' }}>
+              <AlertTriangle size={10} /> {warnings.length} þarfnast athygli
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Warnings */}
+      {warnings.map(s => (
+        <div key={s.id} className="flex items-start gap-2 p-3 rounded-xl"
+             style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+          <AlertTriangle size={14} style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }} />
+          <div className="text-xs">
+            <span className="font-medium">{s.icon} {s.name}: </span>
+            <span style={{ color: 'var(--muted)' }}>{s.note}</span>
+          </div>
+        </div>
+      ))}
+
+      {/* Category filter */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {SUB_CATEGORIES.map(c => (
+          <button key={c.id} onClick={() => setFilterCat(c.id)}
+            className="text-xs px-3 py-1 rounded-lg shrink-0 transition-all"
+            style={{
+              background: filterCat === c.id ? `${c.color}22` : 'var(--surface2)',
+              color: filterCat === c.id ? c.color : 'var(--muted)',
+              border: `1px solid ${filterCat === c.id ? c.color + '44' : 'transparent'}`,
+            }}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Add button */}
+      <button onClick={() => setShowForm(!showForm)} className="btn btn-ghost w-full justify-center text-sm">
+        <Plus size={14} /> Bæta við áskrift
+      </button>
+
+      {/* Add form */}
+      {showForm && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Ný áskrift</h3>
+            <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex gap-2">
+            <input className="input w-14 text-center text-lg" value={newSub.icon}
+              onChange={e => setNewSub(p => ({ ...p, icon: e.target.value }))} placeholder="🎵" />
+            <input className="input flex-1" placeholder="Heiti áskriftar" value={newSub.name}
+              onChange={e => setNewSub(p => ({ ...p, name: e.target.value }))} autoFocus />
+          </div>
+          <div className="flex gap-2">
+            <input className="input flex-1" type="number" placeholder="Verð (ISK)" value={newSub.cost}
+              onChange={e => setNewSub(p => ({ ...p, cost: e.target.value }))} />
+            <select className="input w-32" value={newSub.billing}
+              onChange={e => setNewSub(p => ({ ...p, billing: e.target.value }))}>
+              <option value="monthly">Mánaðarlegt</option>
+              <option value="yearly">Árlegt</option>
+            </select>
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {SUB_CATEGORIES.filter(c => c.id !== 'all').map(c => (
+              <button key={c.id} type="button" onClick={() => setNewSub(p => ({ ...p, category: c.id }))}
+                className="text-xs px-2 py-1 rounded-lg transition-all"
+                style={{
+                  background: newSub.category === c.id ? `${c.color}22` : 'var(--surface2)',
+                  color: newSub.category === c.id ? c.color : 'var(--muted)',
+                }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+        </form>
+      )}
+
+      {/* Subscription list */}
+      <div className="flex flex-col gap-2">
+        {filtered.map(s => {
+          const catColor = SUB_CATEGORIES.find(c => c.id === s.category)?.color || '#64748b'
+          const mCost = s.billing === 'yearly' ? Math.round(s.cost / 12) : s.cost
+          return (
+            <div key={s.id} className="card flex items-center gap-3 py-3"
+                 style={{ opacity: s.active ? 1 : 0.5 }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                   style={{ background: `${catColor}20` }}>
+                {s.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-medium truncate">{s.name}</span>
+                  {!s.active && <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>Hlé</span>}
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+                  {formatISK(mCost)}/mán
+                  {s.billing === 'yearly' ? ` (${formatISK(s.cost)}/ár)` : ''}
+                  {s.note ? ` · ${s.note}` : ''}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => toggleActive(s.id)} style={{ color: s.active ? 'var(--accent)' : 'var(--muted)' }}>
+                  {s.active ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
+                </button>
+                <button onClick={() => removeSub(s.id)} style={{ color: 'var(--muted)' }}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -113,10 +275,10 @@ export default function Finance() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subs', '💳 Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn text-sm shrink-0 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
@@ -183,6 +345,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subs' && <SubscriptionsTab />}
     </div>
   )
 }
