@@ -1,16 +1,20 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, CreditCard } from 'lucide-react'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/subscriptions', icon: CreditCard, label: 'Áskriftir', badge: true },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
 ]
 
 export default function Sidebar() {
+  const { failedSubs } = useSubscriptions()
+
   return (
     <aside className="hidden md:flex flex-col w-56 shrink-0 h-screen sticky top-0 py-6 px-3"
            style={{ borderRight: '1px solid var(--border)', background: 'rgba(10,14,26,0.98)' }}>
@@ -22,7 +26,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, label, badge }) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -34,7 +38,13 @@ export default function Sidebar() {
             {({ isActive }) => (
               <>
                 <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
-                {label}
+                <span className="flex-1">{label}</span>
+                {badge && failedSubs.length > 0 && (
+                  <span className="w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold"
+                        style={{ background: 'var(--danger)', color: '#fff', fontSize: 10 }}>
+                    {failedSubs.length}
+                  </span>
+                )}
               </>
             )}
           </NavLink>
