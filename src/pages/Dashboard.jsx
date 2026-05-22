@@ -6,6 +6,9 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import InterWidget from '../components/widgets/InterWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
+import NewsWidget from '../components/widgets/NewsWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -30,6 +33,12 @@ export default function Dashboard() {
       {/* Weather */}
       <WeatherWidget />
 
+      {/* Inter + Lendó side by side */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <InterWidget />
+        <LendoWidget />
+      </div>
+
       {/* Spotify */}
       <SpotifyWidget />
 
@@ -41,6 +50,9 @@ export default function Dashboard() {
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
+
+      {/* News */}
+      <NewsWidget />
 
       {/* Quick note */}
       <QuickNoteWidget />

@@ -1,17 +1,17 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, Trophy, Home } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/sports', icon: Trophy, label: 'Inter' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
+  { to: '/lendo', icon: Home, label: 'Lendó' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
 ]
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom md:hidden"
          style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
       <div className="flex items-center justify-around px-2 pt-2 pb-1">
         {NAV.map(({ to, icon: Icon, label }) => (
