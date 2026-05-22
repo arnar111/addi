@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, CreditCard, ToggleLeft, ToggleRight } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -20,6 +21,96 @@ function CategoryBar({ cat, spent, budget }) {
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
+    </div>
+  )
+}
+
+function SubscriptionsTab() {
+  const { subs, add, remove, toggle, monthlyTotal, yearlyTotal } = useSubscriptions()
+  const [showForm, setShowForm] = useState(false)
+  const [name, setName] = useState('')
+  const [icon, setIcon] = useState('📱')
+  const [amount, setAmount] = useState('')
+
+  const handleAdd = (e) => {
+    e.preventDefault()
+    if (!name.trim() || !amount) return
+    add(name.trim(), icon, Number(amount))
+    setName(''); setIcon('📱'); setAmount('')
+    setShowForm(false)
+  }
+
+  const ICONS = ['📱', '🎵', '🎬', '📰', '⛳', '🎮', '☁️', '💼', '📺', '🏋️', '🎓', '🛡️']
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Summary */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(0,212,170,0.06))' }}>
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegar áskriftir</div>
+            <div className="text-3xl font-semibold">{formatISK(monthlyTotal)}</div>
+            <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{formatISK(yearlyTotal)} á ári</div>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <CreditCard size={20} style={{ color: 'var(--accent2)' }} />
+            <span className="text-xs" style={{ color: 'var(--muted)' }}>{subs.filter(s => s.active).length} virkar</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Add form */}
+      {showForm && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Ný áskrift</h3>
+            <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <input className="input" placeholder="Heiti áskriftar" value={name} onChange={e => setName(e.target.value)} autoFocus />
+          <input className="input" type="number" placeholder="Mánaðarleg upphæð (ISK)" value={amount} onChange={e => setAmount(e.target.value)} />
+          <div>
+            <div className="text-xs mb-2" style={{ color: 'var(--muted)' }}>Tákn</div>
+            <div className="flex flex-wrap gap-2">
+              {ICONS.map(ic => (
+                <button key={ic} type="button" onClick={() => setIcon(ic)}
+                        className="w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all"
+                        style={{ background: icon === ic ? 'rgba(0,212,170,0.15)' : 'var(--surface2)',
+                                 border: `1px solid ${icon === ic ? 'var(--accent)' : 'transparent'}` }}>
+                  {ic}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+        </form>
+      )}
+
+      {/* Subscription list */}
+      <div className="flex flex-col gap-2">
+        {subs.map(s => (
+          <div key={s.id} className="card flex items-center gap-3 py-3"
+               style={{ opacity: s.active ? 1 : 0.5 }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                 style={{ background: 'var(--surface2)' }}>{s.icon}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium">{s.name}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                {formatISK(s.monthlyISK)}/mán · {formatISK(s.monthlyISK * 12)}/ár
+              </div>
+            </div>
+            <button onClick={() => toggle(s.id)} style={{ color: s.active ? 'var(--accent)' : 'var(--muted)' }}>
+              {s.active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+            </button>
+            <button onClick={() => remove(s.id)} style={{ color: 'var(--muted)' }}>
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={() => setShowForm(true)} className="btn btn-ghost w-full justify-center">
+        <Plus size={16} /> Bæta við áskrift
+      </button>
     </div>
   )
 }
@@ -57,37 +148,41 @@ export default function Finance() {
             {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
-          <Plus size={16} /> Gjald
-        </button>
+        {tab !== 'subscriptions' && (
+          <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
+            <Plus size={16} /> Gjald
+          </button>
+        )}
       </div>
 
       {/* Overview card */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
-            <div className="text-3xl font-semibold">{formatISK(total)}</div>
-          </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
-            <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-              {isOver ? '-' : ''}{formatISK(Math.abs(left))}
+      {tab !== 'subscriptions' && (
+        <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
+              <div className="text-3xl font-semibold">{formatISK(total)}</div>
+            </div>
+            <div className="flex flex-col items-end">
+              <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
+              <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+                {isOver ? '-' : ''}{formatISK(Math.abs(left))}
+              </div>
             </div>
           </div>
+          <div className="h-2.5 rounded-full overflow-hidden mb-1" style={{ background: 'var(--surface2)' }}>
+            <div className="h-full rounded-full transition-all"
+                 style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
+          </div>
+          <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
+            <span>{pct}% notað</span>
+            <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
+          </div>
         </div>
-        <div className="h-2.5 rounded-full overflow-hidden mb-1" style={{ background: 'var(--surface2)' }}>
-          <div className="h-full rounded-full transition-all"
-               style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
-        </div>
-        <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
-          <span>{pct}% notað</span>
-          <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
-        </div>
-      </div>
+      )}
 
       {/* Add expense form */}
-      {showForm && (
+      {showForm && tab !== 'subscriptions' && (
         <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm">Bæta við gjaldi</h3>
@@ -113,10 +208,10 @@ export default function Finance() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', '📱 Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn text-sm shrink-0 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
@@ -183,6 +278,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subscriptions' && <SubscriptionsTab />}
     </div>
   )
 }
