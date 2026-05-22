@@ -1,7 +1,10 @@
 import { useLocalStorage } from './useLocalStorage'
+import { useLendo } from './useLendo'
 
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [incomeEntries, setIncomeEntries] = useLocalStorage('addi_income', [])
+  const { monthlyIncome: lendoMonthlyIncome } = useLendo()
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
     categories: {
@@ -26,9 +29,31 @@ export function useFinance() {
     }, ...prev])
   }
 
-  const removeExpense = (id) => {
-    setExpenses(prev => prev.filter(e => e.id !== id))
+  const removeExpense = (id) => setExpenses(prev => prev.filter(e => e.id !== id))
+
+  const addIncome = (amount, source, note = '', date = null) => {
+    setIncomeEntries(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source,
+      note,
+      date: date || new Date().toISOString(),
+    }, ...prev])
   }
+
+  const removeIncome = (id) => setIncomeEntries(prev => prev.filter(e => e.id !== id))
+
+  const currentMonthIncome = () => {
+    const now = new Date()
+    return incomeEntries.filter(e => {
+      const d = new Date(e.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
+  const manualMonthlyIncome = () => currentMonthIncome().reduce((s, e) => s + e.amount, 0)
+  const totalMonthlyIncome = () => manualMonthlyIncome() + lendoMonthlyIncome()
+  const netBalance = () => totalMonthlyIncome() - monthlyTotal()
 
   const currentMonth = () => {
     const now = new Date()
@@ -55,8 +80,10 @@ export function useFinance() {
 
   return {
     expenses, addExpense, removeExpense,
+    incomeEntries, addIncome, removeIncome,
     budget, setBudget,
     currentMonth, monthlyTotal, byCategory, remaining,
+    currentMonthIncome, manualMonthlyIncome, totalMonthlyIncome, netBalance,
     recentExpenses,
   }
 }
