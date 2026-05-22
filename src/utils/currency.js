@@ -13,12 +13,20 @@ export function formatShortISK(amount) {
 }
 
 export const EXPENSE_CATEGORIES = [
-  { id: 'food', label: 'Matur', icon: '🍽️', color: '#f97316' },
-  { id: 'transport', label: 'Samgöngur', icon: '🚗', color: '#3b82f6' },
-  { id: 'housing', label: 'Húsnæði', icon: '🏠', color: '#8b5cf6' },
-  { id: 'entertainment', label: 'Afþreying', icon: '🎮', color: '#ec4899' },
-  { id: 'health', label: 'Heilsa', icon: '💊', color: '#22c55e' },
-  { id: 'shopping', label: 'Innkaup', icon: '🛍️', color: '#eab308' },
-  { id: 'subscriptions', label: 'Áskriftir', icon: '📱', color: '#00d4aa' },
-  { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
+  { id: 'food',           label: 'Matur',      icon: '🍽️', color: '#f97316' },
+  { id: 'transport',      label: 'Samgöngur',  icon: '🚗', color: '#3b82f6' },
+  { id: 'housing',        label: 'Húsnæði',    icon: '🏠', color: '#8b5cf6' },
+  { id: 'entertainment',  label: 'Afþreying',  icon: '🎮', color: '#ec4899' },
+  { id: 'health',         label: 'Heilsa',     icon: '💊', color: '#22c55e' },
+  { id: 'shopping',       label: 'Innkaup',    icon: '🛍️', color: '#eab308' },
+  { id: 'subscriptions',  label: 'Áskriftir',  icon: '📱', color: '#00d4aa' },
+  { id: 'other',          label: 'Annað',      icon: '💰', color: '#64748b' },
+]
+
+export const INCOME_CATEGORIES = [
+  { id: 'lendo',      label: 'Lendó',       icon: '🪑', color: '#00d4aa' },
+  { id: 'salary',     label: 'Laun',        icon: '💼', color: '#3b82f6' },
+  { id: 'freelance',  label: 'Frítími',     icon: '💻', color: '#8b5cf6' },
+  { id: 'invest',     label: 'Fjárfesting', icon: '📈', color: '#22c55e' },
+  { id: 'other_inc',  label: 'Annað',       icon: '💰', color: '#f97316' },
 ]

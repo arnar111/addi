@@ -1,13 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import {
+  LayoutDashboard, CheckSquare, Wallet, FileText,
+  Timer, Settings, Trophy, FolderGit2
+} from 'lucide-react'
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
-  { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
-  { to: '/settings', icon: Settings, label: 'Stillingar' },
+  { to: '/',         icon: LayoutDashboard, label: 'Mælaborð'   },
+  { to: '/tasks',    icon: CheckSquare,     label: 'Verkefni'   },
+  { to: '/finance',  icon: Wallet,          label: 'Fjármál'    },
+  { to: '/sport',    icon: Trophy,          label: 'Sport'      },
+  { to: '/projects', icon: FolderGit2,      label: 'Forrit'     },
+  { to: '/notes',    icon: FileText,        label: 'Minnisblöð' },
+  { to: '/timer',    icon: Timer,           label: 'Tímari'     },
+  { to: '/settings', icon: Settings,        label: 'Stillingar' },
 ]
 
 export default function Sidebar() {
@@ -18,7 +23,7 @@ export default function Sidebar() {
         <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
              style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
@@ -42,7 +47,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Addi · Reykjavík
       </div>
     </aside>
   )
