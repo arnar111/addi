@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Home, Trophy } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
+  { to: '/football', icon: Trophy, label: 'Knattspyrna', accent: '#00d4aa' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/lendo', icon: Home, label: 'Lendó', accent: '#f97316' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
@@ -22,7 +24,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, label, accent }) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -30,7 +32,8 @@ export default function Sidebar() {
                   ? 'bg-[rgba(0,212,170,0.12)] text-[var(--accent)]'
                   : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface2)]'
               }`
-            }>
+            }
+            style={({ isActive }) => isActive && accent ? { color: accent, background: `${accent}18` } : {}}>
             {({ isActive }) => (
               <>
                 <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
@@ -42,7 +45,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Reykjavík 🇮🇸
       </div>
     </aside>
   )

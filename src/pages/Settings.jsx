@@ -1,13 +1,24 @@
+import { useState } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { useFootball } from '../hooks/useFootball'
+import { User, MapPin, Trash2, Info, Key, Check, ExternalLink } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const { apiKey, saveKey } = useFootball()
+  const [keyInput, setKeyInput] = useState(apiKey || '')
+  const [keySaved, setKeySaved] = useState(false)
+
+  const handleSaveKey = () => {
+    saveKey(keyInput.trim())
+    setKeySaved(true)
+    setTimeout(() => setKeySaved(false), 2000)
+  }
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'lendo_bookings', 'lendo_items', 'lendo_goal']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +44,41 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+        </div>
+      </div>
+
+      {/* Football API */}
+      <div className="card flex flex-col gap-4" style={{ border: '1px solid rgba(0,212,170,0.15)' }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Key size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Knattspyrna API</span>
+        </div>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Sæktu ókeypis API-lykil á <strong style={{ color: 'var(--text)' }}>football-data.org</strong> til að fá rauntíma niðurstöður og töflur í stað sýnigagna.
+        </p>
+        <div className="flex gap-2">
+          <input
+            className="input text-sm flex-1"
+            placeholder="Límdu API-lykil hér..."
+            value={keyInput}
+            onChange={e => setKeyInput(e.target.value)}
+            type="password"
+          />
+          <button onClick={handleSaveKey} className="btn btn-primary shrink-0">
+            {keySaved ? <Check size={15} /> : 'Vista'}
+          </button>
+        </div>
+        {apiKey && (
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--success)' }}>
+            <Check size={12} /> Lykill er virkur
+          </div>
+        )}
+        <div className="p-3 rounded-xl text-xs leading-relaxed" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+          <strong className="block mb-1" style={{ color: 'var(--text)' }}>Hvernig:</strong>
+          1. Farðu á football-data.org<br />
+          2. Skráðu þig ókeypis (Basic plan)<br />
+          3. Afritaðu API-lykilinn þinn<br />
+          4. Límdu hann hér og vistaðu
         </div>
       </div>
 
@@ -58,12 +103,11 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA hint */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
         <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          Á iPhone 16 Max: Veldu <strong style={{ color: 'var(--text)' }}>Deila</strong> → <strong style={{ color: 'var(--text)' }}>Bæta við heimaskjá</strong> til að nota Addi eins og native app.
         </p>
       </div>
 
