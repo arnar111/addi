@@ -1,10 +1,7 @@
-export function getGreeting(name = 'Arnar') {
+export function getGreeting(name = 'Addi') {
   const h = new Date().getHours()
-  if (h < 5) return `Góða nótt, ${name}`
-  if (h < 12) return `Góðan daginn, ${name}`
-  if (h < 17) return `Gott síðdegi, ${name}`
-  if (h < 22) return `Gott kvöld, ${name}`
-  return `Góða nótt, ${name}`
+  const base = h < 5 ? 'Góða nótt' : h < 12 ? 'Góðan daginn' : h < 17 ? 'Gott síðdegi' : h < 22 ? 'Gott kvöld' : 'Góða nótt'
+  return name ? `${base}, ${name}` : base
 }
 
 export function formatTime(date = new Date()) {
