@@ -6,6 +6,9 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidget'
+import SportsWidget from '../components/widgets/SportsWidget'
+import HuelWidget from '../components/widgets/HuelWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -27,8 +30,17 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Subscription alerts – most urgent, show first if any */}
+      <SubscriptionAlertWidget />
+
       {/* Weather */}
       <WeatherWidget />
+
+      {/* Sports + Huel side by side on desktop */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <SportsWidget />
+        <HuelWidget />
+      </div>
 
       {/* Spotify */}
       <SpotifyWidget />

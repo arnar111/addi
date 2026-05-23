@@ -3,6 +3,12 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/api/espn/*"
+  to = "https://site.api.espn.com/apis/site/v2/sports/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

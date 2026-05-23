@@ -1,13 +1,17 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Info, Trash2, Smartphone } from 'lucide-react'
 
 export default function Settings() {
-  const [name, setName] = useLocalStorage('addi_name', 'Arnar')
-  const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [name, setName]               = useLocalStorage('addi_name', 'Arnar')
+  const [city, setCity]               = useLocalStorage('addi_city', 'Reykjavík')
+  const [huelNext, setHuelNext]       = useLocalStorage('addi_huel_next', '2026-05-27')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = [
+      'addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes',
+      'addi_budget', 'addi_subscriptions_v2', 'addi_huel_next',
+    ]
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -30,10 +34,22 @@ export default function Settings() {
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
-            <MapPin size={11} /> Staður (veður)
+            <MapPin size={11} /> Veðurstaður
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+        </div>
+      </div>
+
+      {/* Huel */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-base">🥤</span>
+          <span className="font-semibold text-sm">Huel afhending</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs" style={{ color: 'var(--muted)' }}>Næsta afhendingardagur</label>
+          <input className="input text-sm" type="date" value={huelNext}
+                 onChange={e => setHuelNext(e.target.value)} />
         </div>
       </div>
 
@@ -45,7 +61,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -58,12 +74,15 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá (PWA)</span>
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          <strong>iPhone:</strong> Deila → "Bæta við heimaskjá"<br />
+          <strong>Android:</strong> "Bæta við heimaskjá" úr Chrome valmynd
         </p>
       </div>
 
@@ -73,7 +92,9 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
