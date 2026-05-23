@@ -1,10 +1,24 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Trophy, ShoppingCart } from 'lucide-react'
+
+function GolfIcon({ size = 18, strokeWidth = 1.8 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 18v-8" />
+      <path d="M12 10 L17 7 L12 4" />
+      <ellipse cx="12" cy="20" rx="3" ry="1" />
+    </svg>
+  )
+}
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/sports', icon: Trophy, label: 'Knattspyrna' },
+  { to: '/golf', icon: GolfIcon, label: 'Golf' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
@@ -18,7 +32,7 @@ export default function Sidebar() {
         <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
              style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
@@ -42,7 +56,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Reykjavík ⛅
       </div>
     </aside>
   )
