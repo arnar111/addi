@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useLendo } from '../hooks/useLendo'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -26,6 +27,7 @@ function CategoryBar({ cat, spent, budget }) {
 
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { monthlyIncome: getLendoIncome, monthlyPending, monthlyBookingCount } = useLendo()
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
@@ -38,6 +40,8 @@ export default function Finance() {
   const left = remaining()
   const isOver = left < 0
   const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const lendoIncome = getLendoIncome()
+  const net = lendoIncome - total
 
   const handleAdd = (e) => {
     e.preventDefault()
@@ -69,8 +73,8 @@ export default function Finance() {
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
+          <div className="flex flex-col items-end">
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir af fjárhagsáætlun</div>
             <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
             </div>
@@ -80,10 +84,25 @@ export default function Finance() {
           <div className="h-full rounded-full transition-all"
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
         </div>
-        <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
+        <div className="flex justify-between text-xs mb-3" style={{ color: 'var(--muted)' }}>
           <span>{pct}% notað</span>
           <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
         </div>
+        {lendoIncome > 0 && (
+          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--surface2)' }}>
+            <ArrowUpCircle size={16} style={{ color: 'var(--success)', shrink: 0 }} />
+            <div className="flex-1">
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Lendó tekjur</div>
+              <div className="text-sm font-semibold" style={{ color: 'var(--success)' }}>{formatISK(lendoIncome)}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Nettó staða</div>
+              <div className="text-sm font-semibold" style={{ color: net >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+                {net >= 0 ? '+' : ''}{formatISK(net)}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add expense form */}
