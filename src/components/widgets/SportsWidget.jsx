@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom'
 import { useSports } from '../../hooks/useSports'
-import { Newspaper, ChevronRight, Activity } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 function MatchRow({ match }) {
   const isLive = match.statusType === 'STATUS_IN_PROGRESS'
@@ -72,9 +73,9 @@ export default function SportsWidget() {
           <span className="text-base">⚽</span>
           <span className="text-sm font-semibold">Fótbolti</span>
         </div>
-        <a href="#/sports" className="text-xs flex items-center gap-0.5" style={{ color: 'var(--accent)' }}>
+        <Link to="/sports" className="text-xs flex items-center gap-0.5" style={{ color: 'var(--accent)' }}>
           Meira <ChevronRight size={12} />
-        </a>
+        </Link>
       </div>
 
       {/* Matches */}
