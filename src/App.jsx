@@ -10,6 +10,7 @@ import Settings from './pages/Settings'
 import Sports from './pages/Sports'
 import Lendo from './pages/Lendo'
 import Jobs from './pages/Jobs'
+import More from './pages/More'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/more" element={<More />} />
           </Routes>
         </div>
       </main>

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Trophy, Home, Briefcase } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Trophy, Home, Briefcase, CreditCard } from 'lucide-react'
 
 const NAV_PRIMARY = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
@@ -59,7 +59,13 @@ export default function Sidebar() {
         {NAV_SECONDARY.map(item => <NavItem key={item.to} {...item} />)}
       </nav>
 
-      <div className="mt-auto px-3 text-xs" style={{ color: 'var(--muted)' }}>
+      <a href="https://app.netlify.com/teams/arnar1992/billing" target="_blank" rel="noopener noreferrer"
+         className="mt-auto mx-1 flex items-center gap-2 px-3 py-2 rounded-xl"
+         style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', textDecoration: 'none' }}>
+        <CreditCard size={12} style={{ color: 'var(--danger)' }} />
+        <span className="text-xs" style={{ color: 'var(--danger)' }}>Netlify kort vantar</span>
+      </a>
+      <div className="px-3 pt-2 text-xs" style={{ color: 'var(--muted)' }}>
         Arnar · Reykjavík 🇮🇸
       </div>
     </aside>

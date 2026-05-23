@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Trophy, Home, Briefcase, Wallet } from 'lucide-react'
+import { LayoutDashboard, Trophy, Home, Briefcase, MoreHorizontal } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
   { to: '/sports', icon: Trophy, label: 'Sport' },
   { to: '/lendo', icon: Home, label: 'Lendó' },
   { to: '/jobs', icon: Briefcase, label: 'Starf' },
-  { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/more', icon: MoreHorizontal, label: 'Meira' },
 ]
 
 export default function BottomNav() {
