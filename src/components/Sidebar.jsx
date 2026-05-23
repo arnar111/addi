@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Building2 } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/lendo', icon: Building2, label: 'Lendó 🪑' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
@@ -13,12 +14,13 @@ const NAV = [
 export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-56 shrink-0 h-screen sticky top-0 py-6 px-3"
-           style={{ borderRight: '1px solid var(--border)', background: 'rgba(10,14,26,0.98)' }}>
+      style={{ borderRight: '1px solid var(--border)', background: 'rgba(10,14,26,0.98)' }}>
       <div className="flex items-center gap-2 px-3 mb-8">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
-             style={{ background: 'var(--accent)', color: '#000' }}>A</div>
+          style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto px-1.5 py-0.5 rounded-md font-semibold"
+          style={{ background: 'rgba(0,212,170,0.15)', color: 'var(--accent)' }}>v2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
@@ -42,7 +44,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Reykjavík 🇮🇸
       </div>
     </aside>
   )

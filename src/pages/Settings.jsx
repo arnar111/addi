@@ -1,13 +1,17 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { useLendo } from '../hooks/useLendo'
+import { User, MapPin, Trash2, Info, Target, Building2 } from 'lucide-react'
+import { formatISK } from '../utils/currency'
+import { Link } from 'react-router-dom'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const { goal, setGoal } = useLendo()
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_lendo_bookings', 'addi_lendo_goal']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,8 +37,28 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
         </div>
+      </div>
+
+      {/* Lendó settings */}
+      <div className="card flex flex-col gap-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Building2 size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Lendó</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+            <Target size={11} /> Mánaðarlegt tekjumarkmið (ISK)
+          </label>
+          <input className="input text-sm" type="number" value={goal}
+            onChange={e => setGoal(Number(e.target.value))} />
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Núverandi markmið: {formatISK(goal)}
+          </p>
+        </div>
+        <Link to="/lendo" className="btn btn-ghost text-sm justify-center">
+          <Building2 size={14} /> Opna Lendó
+        </Link>
       </div>
 
       {/* App info */}
@@ -45,7 +69,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -58,22 +82,22 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
         <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.{' '}
+          Android: Veldu "Bæta við heimaskjá" úr Chrome.
         </p>
       </div>
 
-      {/* Danger zone */}
+      {/* Danger */}
       <div className="card flex flex-col gap-3" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
         <div className="flex items-center gap-2 mb-1">
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>Eyðir öllum gögnum — ekki hægt að afturkalla.</p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
