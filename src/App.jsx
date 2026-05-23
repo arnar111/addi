@@ -7,6 +7,7 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Lendo from './pages/Lendo'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/finance" element={<Finance />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
+            <Route path="/lendo" element={<Lendo />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
