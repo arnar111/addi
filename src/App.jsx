@@ -6,6 +6,7 @@ import Tasks from './pages/Tasks'
 import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
+import Sport from './pages/Sport'
 import Settings from './pages/Settings'
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/sport" element={<Sport />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/finance" element={<Finance />} />
             <Route path="/notes" element={<Notes />} />

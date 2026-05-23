@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTasks } from '../hooks/useTasks'
-import { Plus, Trash2, Check, Filter, X } from 'lucide-react'
+import { Plus, Trash2, Check, X } from 'lucide-react'
 import { formatDateShort, isPast } from '../utils/time'
 
 const PRIORITIES = ['high', 'medium', 'low']
@@ -8,7 +8,7 @@ const PRIORITY_LABEL = { high: 'Hátt', medium: 'Miðlungs', low: 'Lágt' }
 const PRIORITY_COLOR = { high: '#ef4444', medium: '#f97316', low: '#22c55e' }
 
 export default function Tasks() {
-  const { tasks, add, toggle, remove, clearDone, pending, done } = useTasks()
+  const { add, toggle, remove, clearDone, pending, done } = useTasks()
   const [text, setText] = useState('')
   const [priority, setPriority] = useState('medium')
   const [dueDate, setDueDate] = useState('')

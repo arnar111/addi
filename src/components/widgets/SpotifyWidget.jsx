@@ -1,4 +1,4 @@
-import { Music2, ExternalLink } from 'lucide-react'
+import { Music2 } from 'lucide-react'
 
 export default function SpotifyWidget({ spotifyData }) {
   if (!spotifyData) {

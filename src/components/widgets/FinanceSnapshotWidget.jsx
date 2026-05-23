@@ -1,13 +1,16 @@
 import { useFinance } from '../../hooks/useFinance'
 import { formatShortISK } from '../../utils/currency'
 import { Link } from 'react-router-dom'
-import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 export default function FinanceSnapshotWidget() {
-  const { monthlyTotal, remaining, budget } = useFinance()
+  const { monthlyTotal, monthlyIncome, netBalance, remaining, budget } = useFinance()
   const total = monthlyTotal()
+  const income = monthlyIncome()
+  const net = netBalance()
   const left = remaining()
-  const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const pct = Math.min(100, Math.round((total / (budget.monthly || 1)) * 100))
+  const incomePct = Math.min(100, Math.round((income / (budget.incomeGoal || 200000)) * 100))
   const isOver = left < 0
 
   return (
@@ -19,28 +22,46 @@ export default function FinanceSnapshotWidget() {
         </Link>
       </div>
 
-      <div className="flex justify-between items-end mb-3">
-        <div>
-          <div className="text-2xl font-semibold">{formatShortISK(total)}</div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-            af {formatShortISK(budget.monthly)} fjárhagsáætlun
-          </div>
+      {/* Income + Expenses row */}
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className="flex flex-col gap-0.5">
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Tekjur</div>
+          <div className="text-sm font-semibold" style={{ color: 'var(--success)' }}>+{formatShortISK(income)}</div>
         </div>
-        <div className={`flex items-center gap-1 text-sm font-medium`}
-             style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-          {isOver ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
-          {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+        <div className="flex flex-col gap-0.5">
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Útgjöld</div>
+          <div className="text-sm font-semibold">{formatShortISK(total)}</div>
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Nettó</div>
+          <div className="text-sm font-semibold" style={{ color: net >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+            {net >= 0 ? '+' : ''}{formatShortISK(net)}
+          </div>
         </div>
       </div>
 
-      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
-        <div className="h-full rounded-full transition-all duration-500"
-             style={{
-               width: `${pct}%`,
-               background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)',
-             }} />
+      {/* Expense bar */}
+      <div className="flex flex-col gap-1 mb-2">
+        <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
+          <span>Útgjöld</span>
+          <span>{pct}% · {formatShortISK(left >= 0 ? left : -left)} {left >= 0 ? 'eftir' : 'yfir'}</span>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
+          <div className="h-full rounded-full"
+               style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
+        </div>
       </div>
-      <div className="text-xs mt-1 text-right" style={{ color: 'var(--muted)' }}>{pct}% notað</div>
+
+      {/* Income goal bar (Lendó) */}
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
+          <span>🏠 Lendó mark</span>
+          <span>{incomePct}% · {formatShortISK(income)} / {formatShortISK(budget.incomeGoal || 200000)}</span>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
+          <div className="h-full rounded-full" style={{ width: `${incomePct}%`, background: 'var(--success)' }} />
+        </div>
+      </div>
     </div>
   )
 }
