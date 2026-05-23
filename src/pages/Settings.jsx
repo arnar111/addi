@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Smartphone } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_golf_rounds', 'addi_quicklinks']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -45,7 +45,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,15 +56,23 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <div className="p-2.5 rounded-xl text-xs" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+          Addi inniheldur: Íþróttayfirlit (Man City, Liverpool, Ísland), Golf skorkort, Vanir, Fjármál (ISK), Verkefni, Minnisblöð, Pomodoro og Flýtileiðir.
+        </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
-        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
-        </p>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá (iPhone)</div>
+        </div>
+        <ol className="text-xs leading-relaxed flex flex-col gap-1" style={{ color: 'var(--muted)' }}>
+          <li>1. Opnaðu í Safari</li>
+          <li>2. Veldu "Deila" <span style={{ color: 'var(--text)' }}>⎙</span></li>
+          <li>3. Veldu "Bæta við heimaskjá"</li>
+          <li>4. Addi opnar eins og native app með Dynamic Island!</li>
+        </ol>
       </div>
 
       {/* Danger zone */}

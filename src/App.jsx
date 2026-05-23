@@ -7,6 +7,9 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Sports from './pages/Sports'
+import Golf from './pages/Golf'
+import Habits from './pages/Habits'
 
 export default function App() {
   return (
@@ -22,6 +25,9 @@ export default function App() {
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/sports" element={<Sports />} />
+            <Route path="/golf" element={<Golf />} />
+            <Route path="/habits" element={<Habits />} />
           </Routes>
         </div>
       </main>
