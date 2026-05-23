@@ -6,6 +6,8 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import WC2026Widget from '../components/widgets/WC2026Widget'
+import JobsSnapshotWidget from '../components/widgets/JobsSnapshotWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -30,6 +32,9 @@ export default function Dashboard() {
       {/* Weather */}
       <WeatherWidget />
 
+      {/* World Cup 2026 countdown */}
+      <WC2026Widget />
+
       {/* Spotify */}
       <SpotifyWidget />
 
@@ -38,6 +43,9 @@ export default function Dashboard() {
         <QuickTasksWidget />
         <HabitsWidget />
       </div>
+
+      {/* Jobs snapshot — only shows when you have tracked applications */}
+      <JobsSnapshotWidget />
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />
