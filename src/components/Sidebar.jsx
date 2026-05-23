@@ -3,8 +3,10 @@ import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/football', emoji: '⚽', label: 'Knattspyrna' },
+  { to: '/lendo', emoji: '🪑', label: 'Lendó' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
@@ -22,7 +24,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, emoji, label }) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -33,7 +35,10 @@ export default function Sidebar() {
             }>
             {({ isActive }) => (
               <>
-                <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                {emoji
+                  ? <span style={{ fontSize: 16, lineHeight: 1 }}>{emoji}</span>
+                  : Icon && <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                }
                 {label}
               </>
             )}
