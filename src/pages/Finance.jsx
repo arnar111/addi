@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useCurrency, CURRENCY_TARGETS } from '../hooks/useCurrency'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, ArrowLeftRight, Loader2 } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -19,6 +20,72 @@ function CategoryBar({ cat, spent, budget }) {
           <div className="h-full rounded-full"
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
+      )}
+    </div>
+  )
+}
+
+function CurrencyConverter() {
+  const { rates, loading, error, convert } = useCurrency()
+  const [amountISK, setAmountISK] = useState('100000')
+
+  const parsed = Number(amountISK.replace(/[^0-9]/g, '')) || 0
+
+  return (
+    <div className="card flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <ArrowLeftRight size={15} style={{ color: 'var(--accent)' }} />
+        <span className="font-semibold text-sm">Gengisreiknir</span>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-xs" style={{ color: 'var(--muted)' }}>Upphæð í ISK</label>
+        <input
+          className="input text-lg font-semibold"
+          type="number"
+          value={amountISK}
+          onChange={e => setAmountISK(e.target.value)}
+          placeholder="100000"
+        />
+      </div>
+
+      {loading && (
+        <div className="flex items-center gap-2" style={{ color: 'var(--muted)' }}>
+          <Loader2 size={14} className="animate-spin" />
+          <span className="text-xs">Sæki gengi...</span>
+        </div>
+      )}
+
+      {error && (
+        <p className="text-xs" style={{ color: 'var(--danger)' }}>Gat ekki sótt gengi</p>
+      )}
+
+      {rates && !loading && (
+        <div className="grid grid-cols-2 gap-2">
+          {CURRENCY_TARGETS.map(c => {
+            const converted = convert(parsed, c.code)
+            if (converted === null) return null
+            return (
+              <div key={c.code} className="flex flex-col gap-0.5 p-3 rounded-xl"
+                   style={{ background: 'var(--surface2)' }}>
+                <div className="flex items-center gap-1.5">
+                  <span style={{ fontSize: 18 }}>{c.flag}</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--muted)' }}>{c.code}</span>
+                </div>
+                <span className="text-base font-bold">
+                  {new Intl.NumberFormat('is-IS', { maximumFractionDigits: 2 }).format(converted)}
+                </span>
+                <span className="text-xs" style={{ color: 'var(--muted)' }}>{c.label}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {rates && (
+        <p className="text-xs text-center" style={{ color: 'var(--muted)' }}>
+          Gengi uppfært á klukkutíma fresti · Frankfurter
+        </p>
       )}
     </div>
   )
@@ -69,7 +136,7 @@ export default function Finance() {
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
+          <div className="flex flex-col items-end">
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
             <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
@@ -93,8 +160,10 @@ export default function Finance() {
             <h3 className="font-semibold text-sm">Bæta við gjaldi</h3>
             <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
           </div>
-          <input className="input" type="number" placeholder="Upphæð (ISK)" value={amount} onChange={e => setAmount(e.target.value)} autoFocus />
-          <input className="input" placeholder="Skýring (valkvæmt)" value={note} onChange={e => setNote(e.target.value)} />
+          <input className="input" type="number" placeholder="Upphæð (ISK)" value={amount}
+                 onChange={e => setAmount(e.target.value)} autoFocus />
+          <input className="input" placeholder="Skýring (valkvæmt)" value={note}
+                 onChange={e => setNote(e.target.value)} />
           <div className="grid grid-cols-4 gap-1.5">
             {EXPENSE_CATEGORIES.map(c => (
               <button key={c.id} type="button" onClick={() => setCategory(c.id)}
@@ -114,13 +183,15 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['currency', 'Gengi']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
               border: `1px solid ${tab === t ? 'rgba(0,212,170,0.25)' : 'var(--border)'}`,
+              fontSize: 13,
+              padding: '7px 8px',
             }}>{l}</button>
         ))}
       </div>
@@ -183,6 +254,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'currency' && <CurrencyConverter />}
     </div>
   )
 }
