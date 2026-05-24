@@ -1,13 +1,14 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { User, MapPin, Trash2, Info, Timer, ExternalLink } from 'lucide-react'
 
 export default function Settings() {
-  const [name, setName] = useLocalStorage('addi_name', 'Arnar')
+  const [name, setName] = useLocalStorage('addi_name', 'Addi')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_lendo_bookings', 'addi_lendo_goal']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -45,7 +46,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,6 +57,19 @@ export default function Settings() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="card flex flex-col gap-2">
+        <div className="flex items-center gap-2 mb-1">
+          <ExternalLink size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Flýtileiðir</span>
+        </div>
+        <Link to="/timer" className="flex items-center gap-3 p-2.5 rounded-xl" style={{ background: 'var(--surface2)' }}>
+          <Timer size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm">Tímari (Pomodoro &amp; Ræðukeppni)</span>
+          <ExternalLink size={12} className="ml-auto" style={{ color: 'var(--muted)' }} />
+        </Link>
       </div>
 
       {/* PWA install hint */}
