@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, Briefcase } from 'lucide-react'
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
-  { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
-  { to: '/settings', icon: Settings, label: 'Stillingar' },
+  { to: '/',        icon: LayoutDashboard, label: 'Mælaborð' },
+  { to: '/tasks',   icon: CheckSquare,     label: 'Verkefni'  },
+  { to: '/finance', icon: Wallet,          label: 'Fjármál'   },
+  { to: '/jobs',    icon: Briefcase,       label: 'Störf'     },
+  { to: '/notes',   icon: FileText,        label: 'Minnisblöð'},
+  { to: '/timer',   icon: Timer,           label: 'Tímari'    },
+  { to: '/settings',icon: Settings,        label: 'Stillingar'},
 ]
 
 export default function Sidebar() {
