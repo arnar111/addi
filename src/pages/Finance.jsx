@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign, Check, CreditCard } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -32,6 +33,7 @@ export default function Finance() {
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
   const [tab, setTab] = useState('overview')
+  const { upcoming: upcomingSubs, monthlyTotal: subsMonthly, markPaid, removeSub, addSub } = useSubscriptions()
 
   const total = monthlyTotal()
   const cats = byCategory()
@@ -114,7 +116,7 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', '💳 Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
@@ -181,6 +183,54 @@ export default function Finance() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {tab === 'subscriptions' && (
+        <div className="flex flex-col gap-3">
+          <div className="card flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold">Mánaðarleg áskriftarútgjöld</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>{upcomingSubs.length} áskriftir</div>
+            </div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{formatISK(subsMonthly)}</div>
+          </div>
+          {upcomingSubs.map(s => (
+            <div key={s.id} className="card flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+                   style={{ background: `${s.color}22` }}>{s.icon}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">{s.name}</span>
+                  {s.days <= 3 && (
+                    <span className="badge text-xs" style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--danger)' }}>
+                      {s.days <= 0 ? 'í dag!' : `${s.days}d`}
+                    </span>
+                  )}
+                  {s.days > 3 && s.days <= 7 && (
+                    <span className="badge text-xs" style={{ background: 'rgba(249,115,22,0.15)', color: 'var(--accent3)' }}>
+                      {s.days}d
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                  {s.note} · {new Date(s.nextDate).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="text-sm font-bold">{formatISK(s.amount)}</div>
+                <div className="flex gap-1">
+                  <button className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)' }} onClick={() => markPaid(s.id)}>
+                    Greitt
+                  </button>
+                  <button onClick={() => removeSub(s.id)}><Trash2 size={12} style={{ color: 'var(--muted)' }} /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+          <button className="btn btn-ghost w-full justify-center text-sm" onClick={() => addSub({ name: 'Ný áskrift', amount: 1000, currency: 'ISK', icon: '📦', color: '#64748b', nextDate: new Date().toISOString().slice(0, 10), frequency: 'monthly', note: '' })}>
+            <Plus size={14} /> Bæta við áskrift
+          </button>
         </div>
       )}
     </div>
