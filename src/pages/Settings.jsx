@@ -1,13 +1,14 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, FileText, Timer, ExternalLink } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Settings() {
-  const [name, setName] = useLocalStorage('addi_name', 'Arnar')
+  const [name, setName] = useLocalStorage('addi_name', 'Addi')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_lendo', 'addi_jobs']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -54,6 +55,24 @@ export default function Settings() {
               <span className="text-xs" style={{ color: 'var(--muted)' }}>{k}</span>
               <span className="font-medium text-sm">{v}</span>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick links - mobile only (these pages not in bottom nav) */}
+      <div className="card flex flex-col gap-3 md:hidden">
+        <div className="text-sm font-semibold mb-1">Flýtitenglar</div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { to: '/notes', icon: FileText, label: 'Minnisblöð' },
+            { to: '/timer', icon: Timer, label: 'Tímari' },
+          ].map(({ to, icon: Icon, label }) => (
+            <Link key={to} to={to}
+              className="flex items-center gap-2 p-3 rounded-xl text-sm font-medium"
+              style={{ background: 'var(--surface2)', color: 'var(--text)' }}>
+              <Icon size={16} style={{ color: 'var(--accent)' }} />
+              {label}
+            </Link>
           ))}
         </div>
       </div>
