@@ -8,6 +8,7 @@ import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
 import FootballWidget from '../components/widgets/FootballWidget'
 import SubscriptionsWidget from '../components/widgets/SubscriptionsWidget'
+import AILinksWidget from '../components/widgets/AILinksWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -35,6 +36,8 @@ export default function Dashboard() {
       <SpotifyWidget />
 
       <FootballWidget />
+
+      <AILinksWidget />
 
       <div className="grid md:grid-cols-2 gap-4">
         <QuickTasksWidget />

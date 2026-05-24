@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign, Check, CreditCard } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0

@@ -2,17 +2,32 @@ import { useLocalStorage } from './useLocalStorage'
 
 const WEIGHTS = [1.5, 1.2, 1.1, 1.0, 1.0, 0.9]
 
+// Survivor S49 "Vendetta" cast
 const DEFAULT_CAST = [
-  'Survivor 1', 'Survivor 2', 'Survivor 3', 'Survivor 4', 'Survivor 5',
-  'Survivor 6', 'Survivor 7', 'Survivor 8', 'Survivor 9', 'Survivor 10',
-  'Survivor 11', 'Survivor 12', 'Survivor 13', 'Survivor 14', 'Survivor 15',
-  'Survivor 16', 'Survivor 17', 'Survivor 18',
+  'Jason Treul',
+  'Kristina Mills',
+  'Sophi Balerdi',
+  'Rizo Velovic',
+  'Savannah Louie',
+  'MC Chukwujekwu',
+  'Alex Moore',
+  'Sage Ahrens-Nichols',
+  'Sophie Segreti',
+  'Annie Davis',
+  'Jake Latimer',
+  'Shannon Fairweather',
+  'Matt Williams',
+  'Jawan Pitts',
+  'Nicole Mazullo',
+  'Nate Moore',
+  'Jeremiah Ing',
+  'Steven Ramm',
 ]
 
 const DEFAULT_PLAYERS = []
 
 export function useThraukarinn() {
-  const [season, setSeason] = useLocalStorage('thraukarinn-season', { number: 50, name: 'Survivor 50' })
+  const [season, setSeason] = useLocalStorage('thraukarinn-season', { number: 50, name: 'Þraukarinn S50 · Survivor S49' })
   const [cast, setCast] = useLocalStorage('thraukarinn-cast', DEFAULT_CAST)
   const [eliminated, setEliminated] = useLocalStorage('thraukarinn-eliminated', [])
   const [players, setPlayers] = useLocalStorage('thraukarinn-players', DEFAULT_PLAYERS)
