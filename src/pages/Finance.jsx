@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, ToggleLeft, ToggleRight } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
-  const isOver = spent > budget
+  const isOver = spent > budget && budget > 0
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between text-xs">
@@ -24,14 +25,45 @@ function CategoryBar({ cat, spent, budget }) {
   )
 }
 
+function SubRow({ sub, onToggle, onRemove }) {
+  const monthly = sub.freq === 'monthly' ? sub.amount : Math.round(sub.amount / 12)
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-lg w-7 text-center shrink-0">{sub.icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium" style={{ color: sub.active ? 'var(--text)' : 'var(--muted)', textDecoration: sub.active ? 'none' : 'line-through' }}>
+          {sub.name}
+        </div>
+        <div className="text-xs" style={{ color: 'var(--muted)' }}>
+          {formatISK(sub.amount)}/{sub.freq === 'monthly' ? 'mán' : 'ár'} · {formatISK(monthly)}/mán
+        </div>
+      </div>
+      <button onClick={() => onToggle(sub.id)} style={{ color: sub.active ? 'var(--accent)' : 'var(--muted)' }}>
+        {sub.active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+      </button>
+      <button onClick={() => onRemove(sub.id)} style={{ color: 'var(--muted)' }}>
+        <Trash2 size={14} />
+      </button>
+    </div>
+  )
+}
+
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { subs, add: addSub, remove: removeSub, toggle: toggleSub, activeMonthly, activeYearly } = useSubscriptions()
+
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
+  const [showSubForm, setShowSubForm] = useState(false)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
   const [tab, setTab] = useState('overview')
+
+  const [subName, setSubName] = useState('')
+  const [subAmount, setSubAmount] = useState('')
+  const [subFreq, setSubFreq] = useState('monthly')
+  const [subIcon, setSubIcon] = useState('📱')
 
   const total = monthlyTotal()
   const cats = byCategory()
@@ -48,6 +80,16 @@ export default function Finance() {
     setShowForm(false)
   }
 
+  const handleAddSub = (e) => {
+    e.preventDefault()
+    if (!subName || !subAmount) return
+    addSub({ name: subName, amount: Number(subAmount), freq: subFreq, icon: subIcon })
+    setSubName(''); setSubAmount(''); setSubIcon('📱')
+    setShowSubForm(false)
+  }
+
+  const tabs = [['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', `Áskriftir (${subs.length})`]]
+
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="flex items-center justify-between px-1 pt-2">
@@ -62,14 +104,13 @@ export default function Finance() {
         </button>
       </div>
 
-      {/* Overview card */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
+          <div className="flex flex-col items-end">
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
             <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
@@ -86,7 +127,6 @@ export default function Finance() {
         </div>
       </div>
 
-      {/* Add expense form */}
       {showForm && (
         <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
           <div className="flex items-center justify-between">
@@ -112,11 +152,10 @@ export default function Finance() {
         </form>
       )}
 
-      {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+      <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        {tabs.map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
+            className="btn text-sm shrink-0 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
@@ -181,6 +220,49 @@ export default function Finance() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {tab === 'subscriptions' && (
+        <div className="flex flex-col gap-3">
+          <div className="card" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.2)' }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Virkar áskriftir / mánuð</div>
+              <TrendingDown size={14} style={{ color: 'var(--accent2)' }} />
+            </div>
+            <div className="text-2xl font-semibold">{formatISK(activeMonthly)}</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{formatISK(activeYearly)} á ári</div>
+          </div>
+
+          <div className="card flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Áskriftir</h3>
+              <button onClick={() => setShowSubForm(!showSubForm)} className="text-xs" style={{ color: 'var(--accent)' }}>+ Bæta við</button>
+            </div>
+
+            {showSubForm && (
+              <form onSubmit={handleAddSub} className="flex flex-col gap-2 p-3 rounded-xl animate-slide-up" style={{ background: 'var(--surface2)' }}>
+                <div className="flex gap-2">
+                  <input className="input text-sm" style={{ width: 48 }} placeholder="🔔" value={subIcon} onChange={e => setSubIcon(e.target.value)} />
+                  <input className="input text-sm flex-1" placeholder="Nafn áskriftar" value={subName} onChange={e => setSubName(e.target.value)} />
+                </div>
+                <div className="flex gap-2">
+                  <input className="input text-sm flex-1" type="number" placeholder="Upphæð (ISK)" value={subAmount} onChange={e => setSubAmount(e.target.value)} />
+                  <select className="input text-sm" style={{ width: 100 }} value={subFreq} onChange={e => setSubFreq(e.target.value)}>
+                    <option value="monthly">Mánaðarlegt</option>
+                    <option value="yearly">Árlegt</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary text-sm justify-center">Bæta við</button>
+              </form>
+            )}
+
+            <div className="flex flex-col gap-3">
+              {subs.map(sub => (
+                <SubRow key={sub.id} sub={sub} onToggle={toggleSub} onRemove={removeSub} />
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

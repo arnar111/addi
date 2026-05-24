@@ -1,18 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, Home, Dumbbell } from 'lucide-react'
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Heim' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
-  { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
+  { to: '/',        icon: LayoutDashboard, label: 'Heim'     },
+  { to: '/lendo',   icon: Home,            label: 'Lendó'    },
+  { to: '/sports',  icon: Dumbbell,        label: 'Spurs'    },
+  { to: '/finance', icon: Wallet,          label: 'Fjármál'  },
+  { to: '/tasks',   icon: CheckSquare,     label: 'Verkefni' },
 ]
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
-         style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom md:hidden"
+         style={{ background: 'rgba(10,14,26,0.96)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
       <div className="flex items-center justify-around px-2 pt-2 pb-1">
         {NAV.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} end={to === '/'}
@@ -24,7 +24,10 @@ export default function BottomNav() {
             {({ isActive }) => (
               <>
                 <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-[rgba(0,212,170,0.15)]' : ''}`}>
-                  <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                  {to === '/sports'
+                    ? <span style={{ fontSize: 20, lineHeight: 1 }}>⚽</span>
+                    : <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                  }
                 </div>
                 <span style={{ fontSize: 10 }}>{label}</span>
               </>
