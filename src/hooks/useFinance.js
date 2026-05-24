@@ -2,8 +2,11 @@ import { useLocalStorage } from './useLocalStorage'
 
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [income, setIncome] = useLocalStorage('addi_income', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
+    salary: 700000,
+    savingsGoal: 100000,
     categories: {
       food: 80000,
       transport: 30000,
@@ -30,6 +33,18 @@ export function useFinance() {
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 
+  const addIncome = (amount, source = 'Laun', note = '') => {
+    setIncome(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source,
+      note,
+      date: new Date().toISOString(),
+    }, ...prev])
+  }
+
+  const removeIncome = (id) => setIncome(prev => prev.filter(e => e.id !== id))
+
   const currentMonth = () => {
     const now = new Date()
     return expenses.filter(e => {
@@ -38,7 +53,16 @@ export function useFinance() {
     })
   }
 
+  const currentMonthIncome = () => {
+    const now = new Date()
+    return income.filter(e => {
+      const d = new Date(e.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
+  const monthlyIncome = () => currentMonthIncome().reduce((s, e) => s + e.amount, 0)
 
   const byCategory = () => {
     const m = currentMonth()
@@ -50,13 +74,16 @@ export function useFinance() {
   }
 
   const remaining = () => budget.monthly - monthlyTotal()
+  const netSavings = () => (monthlyIncome() || budget.salary || 0) - monthlyTotal()
 
-  const recentExpenses = expenses.slice(0, 20)
+  const recentExpenses = expenses.slice(0, 30)
 
   return {
     expenses, addExpense, removeExpense,
+    income, addIncome, removeIncome,
     budget, setBudget,
-    currentMonth, monthlyTotal, byCategory, remaining,
+    currentMonth, currentMonthIncome,
+    monthlyTotal, monthlyIncome, byCategory, remaining, netSavings,
     recentExpenses,
   }
 }

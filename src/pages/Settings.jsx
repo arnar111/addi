@@ -3,7 +3,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { Link } from 'react-router-dom'
 import { User, MapPin, Trash2, Info, Timer, Download, Upload, ShoppingCart, Trophy } from 'lucide-react'
 
-const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_subscriptions', 'addi_name', 'addi_city']
+const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_income', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_subscriptions', 'addi_name', 'addi_city']
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')

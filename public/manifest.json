@@ -1,14 +1,20 @@
 {
   "name": "Addi",
   "short_name": "Addi",
-  "description": "Persónuleg dagleg OS fyrir Arnar",
+  "description": "Persónulegt dagleg app fyrir Arnar — fjármál, venjur, innkaup og fleira",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0e1a",
-  "theme_color": "#0a0e1a",
+  "theme_color": "#00d4aa",
   "orientation": "portrait-primary",
-  "categories": ["productivity", "lifestyle"],
+  "categories": ["productivity", "finance", "lifestyle"],
   "icons": [
     { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Verkefni", "short_name": "Verkefni", "url": "/tasks" },
+    { "name": "Fjármál", "short_name": "Fjármál", "url": "/finance" },
+    { "name": "Innkaup", "short_name": "Innkaup", "url": "/shopping" },
+    { "name": "Fótbolti", "short_name": "Fótbolti", "url": "/football" }
   ]
 }
