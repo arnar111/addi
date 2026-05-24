@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0e1a;
-  --surface: #111827;
-  --surface2: #1a2233;
-  --border: #1f2d40;
+  --bg: #080c17;
+  --surface: #0f1724;
+  --surface2: #162032;
+  --border: #1e2d42;
   --accent: #00d4aa;
   --accent2: #8b5cf6;
   --accent3: #f97316;
-  --text: #e2e8f0;
-  --muted: #64748b;
+  --text: #e8edf5;
+  --muted: #5a6e85;
   --danger: #ef4444;
   --success: #22c55e;
 }
@@ -42,15 +42,17 @@ html, body, #root {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
 }
 
 .card-sm {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.2);
 }
 
 .btn {
@@ -147,3 +149,35 @@ input[type="range"] {
 /* Number input remove arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Date input */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6);
+  cursor: pointer;
+}
+
+/* Button active press feedback */
+button:active { transform: scale(0.97); }
+a:active { opacity: 0.7; }
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Page transitions */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fadeIn 0.2s ease; }
+
+/* Glassmorphism nav */
+.glass {
+  background: rgba(10, 14, 26, 0.92);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+}

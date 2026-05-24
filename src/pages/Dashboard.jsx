@@ -3,6 +3,8 @@ import { getGreeting, formatTime, formatDate } from '../utils/time'
 import { useTasks } from '../hooks/useTasks'
 import { useHabits } from '../hooks/useHabits'
 import { useLendo } from '../hooks/useLendo'
+import { Link } from 'react-router-dom'
+import { Timer } from 'lucide-react'
 import WeatherWidget from '../components/widgets/WeatherWidget'
 import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
@@ -52,7 +54,14 @@ export default function Dashboard() {
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       {/* Header */}
       <div className="px-1 pt-3">
-        <div className="text-2xl font-semibold">{getGreeting()}</div>
+        <div className="flex items-start justify-between">
+          <div className="text-2xl font-semibold">{getGreeting()}</div>
+          <Link to="/timer"
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full shrink-0 mt-1 md:hidden"
+            style={{ background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }}>
+            <Timer size={12} /> Tímari
+          </Link>
+        </div>
         <div className="mt-0.5">
           <span className="text-sm capitalize" style={{ color: 'var(--muted)' }}>
             {formatTime(time)} · {formatDate(time)}
