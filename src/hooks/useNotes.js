@@ -3,20 +3,22 @@ import { useLocalStorage } from './useLocalStorage'
 export function useNotes() {
   const [notes, setNotes] = useLocalStorage('addi_notes', [])
 
-  const add = (text, pinned = false) => {
-    if (!text.trim()) return
+  const add = (text, title = '', color = '', pinned = false) => {
+    if (!text.trim() && !title.trim()) return
     setNotes(prev => [{
       id: Date.now().toString(),
+      title: title.trim(),
       text: text.trim(),
+      color,
       pinned,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }, ...prev])
   }
 
-  const update = (id, text) => {
+  const update = (id, changes) => {
     setNotes(prev => prev.map(n =>
-      n.id === id ? { ...n, text, updatedAt: new Date().toISOString() } : n
+      n.id === id ? { ...n, ...changes, updatedAt: new Date().toISOString() } : n
     ))
   }
 
@@ -36,7 +38,11 @@ export function useNotes() {
 
   const search = (q) => {
     if (!q) return sorted
-    return sorted.filter(n => n.text.toLowerCase().includes(q.toLowerCase()))
+    const ql = q.toLowerCase()
+    return sorted.filter(n =>
+      n.text.toLowerCase().includes(ql) ||
+      (n.title || '').toLowerCase().includes(ql)
+    )
   }
 
   return { notes: sorted, add, update, remove, pin, search }

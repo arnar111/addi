@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNotes } from '../../hooks/useNotes'
-import { StickyNote, Plus, Pin } from 'lucide-react'
+import { Plus, Pin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function QuickNoteWidget() {
@@ -9,6 +9,7 @@ export default function QuickNoteWidget() {
 
   const handleAdd = (e) => {
     e.preventDefault()
+    if (!text.trim()) return
     add(text)
     setText('')
   }
@@ -41,7 +42,10 @@ export default function QuickNoteWidget() {
           {recent.map(n => (
             <div key={n.id} className="flex items-start gap-2 p-2.5 rounded-xl" style={{ background: 'var(--surface2)' }}>
               {n.pinned && <Pin size={12} className="mt-0.5 shrink-0" style={{ color: 'var(--accent)' }} />}
-              <p className="text-sm line-clamp-2 leading-snug flex-1">{n.text}</p>
+              <div className="flex-1 min-w-0">
+                {n.title && <div className="text-xs font-semibold mb-0.5 truncate">{n.title}</div>}
+                <p className="text-sm line-clamp-2 leading-snug" style={{ color: n.title ? 'var(--muted)' : 'var(--text)' }}>{n.text}</p>
+              </div>
             </div>
           ))}
         </div>

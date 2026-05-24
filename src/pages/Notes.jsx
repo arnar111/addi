@@ -2,29 +2,63 @@ import { useState } from 'react'
 import { useNotes } from '../hooks/useNotes'
 import { Plus, Search, Pin, Trash2, Edit2, X, Check } from 'lucide-react'
 
+const NOTE_COLORS = [
+  { id: '', label: 'Sjálfgefið', bg: 'var(--surface)', border: 'var(--border)' },
+  { id: 'yellow', label: 'Gulur', bg: 'rgba(234,179,8,0.08)', border: 'rgba(234,179,8,0.25)' },
+  { id: 'green', label: 'Grænn', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.25)' },
+  { id: 'blue', label: 'Blár', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.25)' },
+  { id: 'purple', label: 'Fjólublár', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.25)' },
+  { id: 'pink', label: 'Bleikur', bg: 'rgba(236,72,153,0.08)', border: 'rgba(236,72,153,0.25)' },
+]
+
+function getColorStyle(colorId) {
+  return NOTE_COLORS.find(c => c.id === colorId) || NOTE_COLORS[0]
+}
+
 function NoteCard({ note, onRemove, onPin, onUpdate }) {
   const [editing, setEditing] = useState(false)
+  const [title, setTitle] = useState(note.title || '')
   const [text, setText] = useState(note.text)
+  const [color, setColor] = useState(note.color || '')
 
   const save = () => {
-    onUpdate(note.id, text)
+    onUpdate(note.id, { title, text, color })
     setEditing(false)
   }
 
+  const cs = getColorStyle(note.color)
+
   return (
-    <div className="card flex flex-col gap-2" style={{ borderColor: note.pinned ? 'rgba(0,212,170,0.3)' : 'var(--border)' }}>
+    <div className="card flex flex-col gap-2"
+         style={{ background: cs.bg, borderColor: note.pinned ? 'rgba(0,212,170,0.3)' : cs.border }}>
       {editing ? (
         <>
+          <input className="input text-sm font-semibold" placeholder="Titill (valkvæmt)" value={title}
+            onChange={e => setTitle(e.target.value)} />
           <textarea className="input resize-none text-sm leading-relaxed" rows={4} value={text}
             onChange={e => setText(e.target.value)} autoFocus />
+          <div className="flex gap-1.5 flex-wrap">
+            {NOTE_COLORS.map(c => (
+              <button key={c.id} type="button" onClick={() => setColor(c.id)}
+                className="w-5 h-5 rounded-full border-2 transition-all"
+                style={{
+                  background: c.id ? c.bg : 'var(--surface2)',
+                  borderColor: color === c.id ? 'var(--accent)' : c.border,
+                }} />
+            ))}
+          </div>
           <div className="flex gap-2">
             <button onClick={save} className="btn btn-primary text-xs py-1.5 px-3"><Check size={12} /> Vista</button>
-            <button onClick={() => { setText(note.text); setEditing(false) }} className="btn btn-ghost text-xs py-1.5 px-3"><X size={12} /></button>
+            <button onClick={() => { setTitle(note.title || ''); setText(note.text); setColor(note.color || ''); setEditing(false) }}
+              className="btn btn-ghost text-xs py-1.5 px-3"><X size={12} /></button>
           </div>
         </>
       ) : (
         <>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{note.text}</p>
+          {note.title && <div className="font-semibold text-sm">{note.title}</div>}
+          <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: note.title ? 'var(--muted)' : 'var(--text)' }}>
+            {note.text}
+          </p>
           <div className="flex items-center justify-between pt-1" style={{ borderTop: '1px solid var(--border)' }}>
             <span className="text-xs" style={{ color: 'var(--muted)' }}>
               {new Date(note.updatedAt).toLocaleDateString('is-IS', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -50,15 +84,20 @@ function NoteCard({ note, onRemove, onPin, onUpdate }) {
 export default function Notes() {
   const { notes, add, update, remove, pin, search } = useNotes()
   const [query, setQuery] = useState('')
+  const [newTitle, setNewTitle] = useState('')
   const [newText, setNewText] = useState('')
+  const [newColor, setNewColor] = useState('')
   const [showForm, setShowForm] = useState(false)
 
   const results = search(query)
 
   const handleAdd = (e) => {
     e.preventDefault()
-    add(newText)
+    if (!newText.trim() && !newTitle.trim()) return
+    add(newText, newTitle, newColor)
+    setNewTitle('')
     setNewText('')
+    setNewColor('')
     setShowForm(false)
   }
 
@@ -76,8 +115,23 @@ export default function Notes() {
 
       {showForm && (
         <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <input className="input font-semibold text-sm" placeholder="Titill (valkvæmt)"
+            value={newTitle} onChange={e => setNewTitle(e.target.value)} />
           <textarea className="input resize-none text-sm" rows={4} placeholder="Skrifaðu minnisblað..."
             value={newText} onChange={e => setNewText(e.target.value)} autoFocus />
+          <div className="flex items-center gap-2">
+            <span className="text-xs shrink-0" style={{ color: 'var(--muted)' }}>Litur:</span>
+            <div className="flex gap-1.5">
+              {NOTE_COLORS.map(c => (
+                <button key={c.id} type="button" onClick={() => setNewColor(c.id)}
+                  className="w-5 h-5 rounded-full border-2 transition-all"
+                  style={{
+                    background: c.id ? c.bg : 'var(--surface2)',
+                    borderColor: newColor === c.id ? 'var(--accent)' : 'var(--border)',
+                  }} />
+              ))}
+            </div>
+          </div>
           <div className="flex gap-2">
             <button type="submit" className="btn btn-primary flex-1 justify-center">Vista</button>
             <button type="button" onClick={() => setShowForm(false)} className="btn btn-ghost"><X size={16} /></button>
