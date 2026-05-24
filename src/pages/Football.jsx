@@ -145,8 +145,8 @@ export default function Football() {
           {[
             { label: 'The Athletic', url: 'https://theathletic.com', icon: '📰' },
             { label: 'BBC Sport', url: 'https://bbc.com/sport/football', icon: '⚽' },
-            { label: 'EPL', url: 'https://premierleague.com', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
             { label: 'Takkarena', url: 'https://takkmvp.netlify.app', icon: '🏆' },
+            { label: 'FIFA World Cup', url: 'https://fifa.com/fifaplus/en/tournaments/mens/worldcup/canadamexicousa2026', icon: '🌍' },
           ].map(l => (
             <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer"
                className="flex items-center gap-2 p-2.5 rounded-xl text-sm"

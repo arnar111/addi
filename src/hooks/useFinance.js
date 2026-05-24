@@ -12,8 +12,8 @@ export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
   const [incomes, setIncomes] = useLocalStorage('addi_incomes', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
-    monthly: 400000,
-    incomeTarget: 600000,
+    monthly: 450000,
+    incomeTarget: 700000,
     categories: {
       food: 80000,
       transport: 30000,
