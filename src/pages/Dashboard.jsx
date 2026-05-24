@@ -6,6 +6,9 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import CryptoWidget from '../components/widgets/CryptoWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -17,9 +20,10 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
+
       {/* Header */}
       <div className="px-1 pt-2">
-        <div className="text-2xl font-semibold">{getGreeting()}</div>
+        <div className="text-2xl font-semibold">{getGreeting()}, Addi 👋</div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-sm" style={{ color: 'var(--muted)' }}>
             {formatTime(time)} · {formatDate(time)}
@@ -29,6 +33,15 @@ export default function Dashboard() {
 
       {/* Weather */}
       <WeatherWidget />
+
+      {/* World Cup countdown – timely! */}
+      <WorldCupWidget />
+
+      {/* Lendó business snapshot */}
+      <LendoWidget />
+
+      {/* Crypto */}
+      <CryptoWidget />
 
       {/* Spotify */}
       <SpotifyWidget />
