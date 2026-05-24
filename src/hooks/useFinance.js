@@ -2,6 +2,7 @@ import { useLocalStorage } from './useLocalStorage'
 
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [income, setIncome] = useLocalStorage('addi_income', { monthly: 650000 })
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
     categories: {
@@ -13,7 +14,7 @@ export function useFinance() {
       shopping: 40000,
       subscriptions: 15000,
       other: 35000,
-    }
+    },
   })
 
   const addExpense = (amount, category, note = '', date = null) => {
@@ -26,9 +27,7 @@ export function useFinance() {
     }, ...prev])
   }
 
-  const removeExpense = (id) => {
-    setExpenses(prev => prev.filter(e => e.id !== id))
-  }
+  const removeExpense = (id) => setExpenses(prev => prev.filter(e => e.id !== id))
 
   const currentMonth = () => {
     const now = new Date()
@@ -41,22 +40,27 @@ export function useFinance() {
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
 
   const byCategory = () => {
-    const m = currentMonth()
     const result = {}
-    m.forEach(e => {
+    currentMonth().forEach(e => {
       result[e.category] = (result[e.category] || 0) + e.amount
     })
     return result
   }
 
   const remaining = () => budget.monthly - monthlyTotal()
+  const savingsAmount = () => income.monthly - monthlyTotal()
+  const savingsRate = () => income.monthly > 0
+    ? Math.round(((income.monthly - monthlyTotal()) / income.monthly) * 100)
+    : 0
 
-  const recentExpenses = expenses.slice(0, 20)
+  const recentExpenses = expenses.slice(0, 30)
 
   return {
     expenses, addExpense, removeExpense,
+    income, setIncome,
     budget, setBudget,
     currentMonth, monthlyTotal, byCategory, remaining,
+    savingsAmount, savingsRate,
     recentExpenses,
   }
 }

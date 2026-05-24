@@ -1,14 +1,17 @@
 import { useFinance } from '../../hooks/useFinance'
 import { formatShortISK } from '../../utils/currency'
 import { Link } from 'react-router-dom'
-import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronRight, TrendingDown, TrendingUp, PiggyBank } from 'lucide-react'
 
 export default function FinanceSnapshotWidget() {
-  const { monthlyTotal, remaining, budget } = useFinance()
+  const { monthlyTotal, remaining, budget, savingsAmount, savingsRate, income } = useFinance()
   const total = monthlyTotal()
   const left = remaining()
-  const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const savings = savingsAmount()
+  const rate = savingsRate()
+  const pct = Math.min(100, budget.monthly > 0 ? Math.round((total / budget.monthly) * 100) : 0)
   const isOver = left < 0
+  const isSavingPos = savings >= 0
 
   return (
     <div className="card">
@@ -26,10 +29,19 @@ export default function FinanceSnapshotWidget() {
             af {formatShortISK(budget.monthly)} fjárhagsáætlun
           </div>
         </div>
-        <div className={`flex items-center gap-1 text-sm font-medium`}
-             style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-          {isOver ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
-          {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+        <div className="flex flex-col items-end gap-1">
+          <div className={`flex items-center gap-1 text-sm font-medium`}
+               style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+            {isOver ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+            {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+          </div>
+          {income.monthly > 0 && (
+            <div className="flex items-center gap-1 text-xs"
+                 style={{ color: isSavingPos ? 'var(--success)' : 'var(--danger)' }}>
+              <PiggyBank size={11} />
+              {isSavingPos ? `${rate}% sparnaður` : 'Yfir tekjur'}
+            </div>
+          )}
         </div>
       </div>
 

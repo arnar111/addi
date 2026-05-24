@@ -7,7 +7,7 @@ export function useHabits() {
     { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
     { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
     { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+    { id: '4', name: 'Hugleiðsla', icon: '🧘', color: '#f97316', completions: [] },
   ])
 
   const toggle = (id) => {
@@ -32,9 +32,9 @@ export function useHabits() {
     }])
   }
 
-  const remove = (id) => {
-    setHabits(prev => prev.filter(h => h.id !== id))
-  }
+  const remove = (id) => setHabits(prev => prev.filter(h => h.id !== id))
+
+  const update = (id, updates) => setHabits(prev => prev.map(h => h.id === id ? { ...h, ...updates } : h))
 
   const isDoneToday = (id) => {
     const h = habits.find(h => h.id === id)
@@ -57,6 +57,14 @@ export function useHabits() {
   }
 
   const todayDone = habits.filter(h => isDoneToday(h.id)).length
+  const weeklyStats = habits.map(h => {
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      return d.toISOString().split('T')[0]
+    })
+    return { id: h.id, completedDays: days.filter(d => h.completions.includes(d)).length }
+  })
 
-  return { habits, toggle, add, remove, isDoneToday, streakFor, todayDone }
+  return { habits, toggle, add, remove, update, isDoneToday, streakFor, todayDone, weeklyStats }
 }

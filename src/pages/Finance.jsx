@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp, PiggyBank, Wallet } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
-  const isOver = spent > budget
+  const isOver = spent > budget && budget > 0
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between text-xs">
         <span>{cat.icon} {cat.label}</span>
         <span style={{ color: isOver ? 'var(--danger)' : 'var(--muted)' }}>
-          {formatShortISK(spent)} {budget ? `/ ${formatShortISK(budget)}` : ''}
+          {formatShortISK(spent)}{budget ? ` / ${formatShortISK(budget)}` : ''}
         </span>
       </div>
       {budget > 0 && (
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
-          <div className="h-full rounded-full"
+          <div className="h-full rounded-full transition-all"
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
@@ -25,9 +25,17 @@ function CategoryBar({ cat, spent, budget }) {
 }
 
 export default function Finance() {
-  const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const {
+    addExpense, removeExpense,
+    income, setIncome,
+    budget, setBudget,
+    monthlyTotal, byCategory, remaining, savingsAmount, savingsRate,
+    recentExpenses,
+  } = useFinance()
+
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
+  const [showIncomeEdit, setShowIncomeEdit] = useState(false)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
@@ -36,16 +44,17 @@ export default function Finance() {
   const total = monthlyTotal()
   const cats = byCategory()
   const left = remaining()
+  const savings = savingsAmount()
+  const rate = savingsRate()
   const isOver = left < 0
-  const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const pct = Math.min(100, budget.monthly > 0 ? Math.round((total / budget.monthly) * 100) : 0)
+  const isSavingPos = savings >= 0
 
   const handleAdd = (e) => {
     e.preventDefault()
     if (!amount || isNaN(Number(amount))) return
     addExpense(Number(amount), category, note)
-    setAmount('')
-    setNote('')
-    setShowForm(false)
+    setAmount(''); setNote(''); setShowForm(false)
   }
 
   return (
@@ -62,15 +71,46 @@ export default function Finance() {
         </button>
       </div>
 
-      {/* Overview card */}
+      {/* Income + savings row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="card-sm flex flex-col gap-1 cursor-pointer" onClick={() => setShowIncomeEdit(v => !v)}>
+          <div className="flex items-center gap-1.5">
+            <Wallet size={13} style={{ color: 'var(--accent)' }} />
+            <span className="text-xs" style={{ color: 'var(--muted)' }}>Tekjur / mán.</span>
+          </div>
+          <div className="text-lg font-semibold">{formatShortISK(income.monthly)}</div>
+        </div>
+        <div className="card-sm flex flex-col gap-1">
+          <div className="flex items-center gap-1.5">
+            <PiggyBank size={13} style={{ color: isSavingPos ? 'var(--success)' : 'var(--danger)' }} />
+            <span className="text-xs" style={{ color: 'var(--muted)' }}>Sparnaður</span>
+          </div>
+          <div className="text-lg font-semibold" style={{ color: isSavingPos ? 'var(--success)' : 'var(--danger)' }}>
+            {formatShortISK(Math.abs(savings))}
+          </div>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>{isSavingPos ? rate : 0}% af tekjum</div>
+        </div>
+      </div>
+
+      {showIncomeEdit && (
+        <div className="card flex flex-col gap-2 animate-slide-up">
+          <label className="text-xs font-semibold" style={{ color: 'var(--muted)' }}>Mánaðarlegar tekjur (ISK)</label>
+          <input className="input text-sm" type="number"
+            value={income.monthly}
+            onChange={e => setIncome({ monthly: Number(e.target.value) })} />
+          <button className="btn btn-primary text-sm" onClick={() => setShowIncomeEdit(false)}>Vista</button>
+        </div>
+      )}
+
+      {/* Monthly overview */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
+          <div className="flex flex-col items-end">
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir af fjárhagsáætlun</div>
             <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
             </div>
