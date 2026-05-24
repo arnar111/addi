@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Info, Trash2, Smartphone, Link as LinkIcon } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_subs', 'addi_portfolio', 'addi_quicklinks']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -18,7 +18,6 @@ export default function Settings() {
         <h1 className="text-xl font-semibold">Stillingar</h1>
       </div>
 
-      {/* Profile */}
       <div className="card flex flex-col gap-4">
         <div className="flex items-center gap-2 mb-1">
           <User size={15} style={{ color: 'var(--accent)' }} />
@@ -33,11 +32,10 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður: Reykjavík (64.13°N, 21.90°V)</p>
         </div>
       </div>
 
-      {/* App info */}
       <div className="card flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-1">
           <Info size={15} style={{ color: 'var(--accent)' }} />
@@ -45,7 +43,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,18 +54,21 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <div className="text-xs leading-relaxed p-3 rounded-xl" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+          Addi v2 · Persónulegt dagstæki · Veður, Crypto (Binance), Íþróttir (ESPN), Fjármál, Verkefni, Vanur, Áskriftir
+        </div>
       </div>
 
-      {/* PWA install hint */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá</span>
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi sem native app með öllum PWA eiginleikum.
         </p>
       </div>
 
-      {/* Danger zone */}
       <div className="card flex flex-col gap-3" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
         <div className="flex items-center gap-2 mb-1">
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />

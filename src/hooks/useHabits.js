@@ -2,13 +2,17 @@ import { useLocalStorage } from './useLocalStorage'
 
 const todayStr = () => new Date().toISOString().split('T')[0]
 
+const DEFAULTS = [
+  { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
+  { id: '2', name: 'Huel', icon: '🥤', color: '#9945FF', completions: [] },
+  { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
+  { id: '4', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
+  { id: '5', name: 'LinkedIn', icon: '💼', color: '#0077b5', completions: [] },
+  { id: '6', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+]
+
 export function useHabits() {
-  const [habits, setHabits] = useLocalStorage('addi_habits', [
-    { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
-  ])
+  const [habits, setHabits] = useLocalStorage('addi_habits', DEFAULTS)
 
   const toggle = (id) => {
     const today = todayStr()
