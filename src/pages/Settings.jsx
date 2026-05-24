@@ -1,13 +1,15 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Wallet, Trash2, Info, Calendar, ExternalLink } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [paydayDay, setPaydayDay] = useLocalStorage('addi_payday', 25)
+  const [income, setIncome] = useLocalStorage('addi_income', 0)
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -37,6 +39,59 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Finance settings */}
+      <div className="card flex flex-col gap-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Wallet size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Fjármál</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+            <Calendar size={11} /> Launadagur (dagur mánaðarins)
+          </label>
+          <div className="flex items-center gap-3">
+            <input className="input text-sm" type="number" min={1} max={31}
+              value={paydayDay} onChange={e => setPaydayDay(Math.max(1, Math.min(31, Number(e.target.value))))}
+              style={{ maxWidth: 100 }} />
+            <span className="text-sm" style={{ color: 'var(--muted)' }}>
+              {paydayDay}. hvers mánaðar
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs" style={{ color: 'var(--muted)' }}>Mánaðarleg laun (ISK) — valkvæmt</label>
+          <input className="input text-sm" type="number" placeholder="0"
+            value={income || ''} onChange={e => setIncome(Number(e.target.value))} />
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Notað til að sýna sparnaðarhlutfall í fjármálum
+          </p>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <ExternalLink size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Tenglar</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            ['🏦', 'Lendo', 'https://lendoapp.is'],
+            ['⚽', 'Man United', 'https://www.manutd.com'],
+            ['📰', 'RÚV', 'https://www.ruv.is'],
+            ['🌡️', 'Veður', 'https://en.vedur.is'],
+          ].map(([icon, label, url]) => (
+            <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+               className="flex items-center gap-2 p-3 rounded-xl text-sm transition-all"
+               style={{ background: 'var(--surface2)', color: 'var(--text)', textDecoration: 'none' }}>
+              <span>{icon}</span>
+              <span className="font-medium">{label}</span>
+              <ExternalLink size={11} className="ml-auto" style={{ color: 'var(--muted)' }} />
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* App info */}
       <div className="card flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-1">
@@ -45,7 +100,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],

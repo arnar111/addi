@@ -44,7 +44,7 @@ export function useWeather(lat = 64.1355, lon = -21.8954) {
     fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m` +
-      `&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+      `&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset` +
       `&timezone=Atlantic%2FReykjavik&forecast_days=5`
     )
       .then(r => r.json())
@@ -56,6 +56,8 @@ export function useWeather(lat = 64.1355, lon = -21.8954) {
           wind: Math.round(d.current.windspeed_10m),
           humidity: d.current.relativehumidity_2m,
           ...WEATHER_CODES[d.current.weathercode] || { label: 'Unknown', icon: '🌡️' },
+          sunrise: d.daily.sunrise?.[0]?.split('T')[1]?.slice(0, 5) || null,
+          sunset: d.daily.sunset?.[0]?.split('T')[1]?.slice(0, 5) || null,
           daily: d.daily.time.slice(0, 5).map((t, i) => ({
             date: t,
             code: d.daily.weathercode[i],

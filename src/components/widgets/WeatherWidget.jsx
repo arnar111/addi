@@ -1,5 +1,5 @@
 import { useWeather } from '../../hooks/useWeather'
-import { Wind, Droplets } from 'lucide-react'
+import { Wind, Droplets, Sunrise, Sunset } from 'lucide-react'
 
 export default function WeatherWidget() {
   const { data, loading } = useWeather()
@@ -26,6 +26,20 @@ export default function WeatherWidget() {
             <span className="text-2xl mb-1">{data.icon}</span>
           </div>
           <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{data.label} · líður eins og {data.feelsLike}°</div>
+          {(data.sunrise || data.sunset) && (
+            <div className="flex items-center gap-3 mt-1.5">
+              {data.sunrise && (
+                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted)' }}>
+                  <Sunrise size={11} /> {data.sunrise}
+                </span>
+              )}
+              {data.sunset && (
+                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted)' }}>
+                  <Sunset size={11} /> {data.sunset}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-1.5 text-xs items-end" style={{ color: 'var(--muted)' }}>
           <span className="flex items-center gap-1"><Wind size={12} /> {data.wind} km/h</span>
