@@ -1,9 +1,19 @@
 import { useLocalStorage } from './useLocalStorage'
 
+export const INCOME_SOURCES = [
+  { id: 'salary',    label: 'Laun',           icon: '💼', color: '#22c55e' },
+  { id: 'freelance', label: 'Frílans',         icon: '💻', color: '#00d4aa' },
+  { id: 'project',   label: 'Verkefnatekjur',  icon: '🚀', color: '#8b5cf6' },
+  { id: 'rental',    label: 'Lendó leiga',     icon: '🏠', color: '#f97316' },
+  { id: 'other',     label: 'Annað',           icon: '💰', color: '#64748b' },
+]
+
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [incomes, setIncomes] = useLocalStorage('addi_incomes', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
+    incomeTarget: 600000,
     categories: {
       food: 80000,
       transport: 30000,
@@ -30,6 +40,20 @@ export function useFinance() {
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 
+  const addIncome = (amount, source, note = '', date = null) => {
+    setIncomes(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source,
+      note,
+      date: date || new Date().toISOString(),
+    }, ...prev])
+  }
+
+  const removeIncome = (id) => {
+    setIncomes(prev => prev.filter(e => e.id !== id))
+  }
+
   const currentMonth = () => {
     const now = new Date()
     return expenses.filter(e => {
@@ -38,7 +62,17 @@ export function useFinance() {
     })
   }
 
+  const currentMonthIncomes = () => {
+    const now = new Date()
+    return incomes.filter(e => {
+      const d = new Date(e.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
+  const monthlyIncome = () => currentMonthIncomes().reduce((s, e) => s + e.amount, 0)
+  const netBalance = () => monthlyIncome() - monthlyTotal()
 
   const byCategory = () => {
     const m = currentMonth()
@@ -50,13 +84,16 @@ export function useFinance() {
   }
 
   const remaining = () => budget.monthly - monthlyTotal()
-
   const recentExpenses = expenses.slice(0, 20)
+  const recentIncomes = incomes.slice(0, 20)
 
   return {
     expenses, addExpense, removeExpense,
+    incomes, addIncome, removeIncome,
     budget, setBudget,
-    currentMonth, monthlyTotal, byCategory, remaining,
-    recentExpenses,
+    currentMonth, currentMonthIncomes,
+    monthlyTotal, monthlyIncome, netBalance,
+    byCategory, remaining,
+    recentExpenses, recentIncomes,
   }
 }
