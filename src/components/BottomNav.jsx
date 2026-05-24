@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, Trophy, Wallet, Briefcase, CheckSquare } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/sport', icon: Trophy, label: 'Íþróttir' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
+  { to: '/jobs', icon: Briefcase, label: 'Vinna' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
 ]
 
 export default function BottomNav() {

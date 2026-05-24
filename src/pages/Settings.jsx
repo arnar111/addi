@@ -1,13 +1,22 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Info, Trash2, ExternalLink, Bell } from 'lucide-react'
+
+const QUICK_LINKS = [
+  { label: 'Alfred.is', url: 'https://alfred.is', desc: 'Íslenskt atvinnumiðlun', icon: '💼' },
+  { label: 'The Athletic', url: 'https://theathletic.com', desc: 'Íþróttafréttir', icon: '⚽' },
+  { label: 'LinkedIn', url: 'https://linkedin.com/jobs', desc: 'Störf á LinkedIn', icon: '🔗' },
+  { label: 'Glassdoor', url: 'https://glassdoor.com', desc: 'Launakannanir', icon: '💰' },
+  { label: 'Wolt', url: 'https://wolt.com', desc: 'Matarafgreiðsla', icon: '🍔' },
+  { label: 'Trip.com', url: 'https://trip.com', desc: 'Ferðalög', icon: '✈️' },
+]
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
-  const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [city, setCity] = useLocalStorage('addi_city', 'Hafnarfjörður')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_jobs', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +42,28 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Hafnarfjörður</p>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <ExternalLink size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Flýtileiðir</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {QUICK_LINKS.map(l => (
+            <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer"
+               className="flex items-center gap-2 p-3 rounded-xl transition-all"
+               style={{ background: 'var(--surface2)' }}>
+              <span className="text-xl">{l.icon}</span>
+              <div className="min-w-0">
+                <div className="text-sm font-medium">{l.label}</div>
+                <div className="text-xs truncate" style={{ color: 'var(--muted)' }}>{l.desc}</div>
+              </div>
+            </a>
+          ))}
         </div>
       </div>
 
@@ -45,7 +75,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -58,12 +88,14 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* PWA install hint */}
+      {/* PWA install */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <div className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--accent)' }}>
+          <Bell size={14} /> 📱 Setja upp á heimaskjá (iPhone 16)
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          Safari → Deila (□↑) → "Bæta við heimaskjá" → Bæta við.
+          Addi keyrir þá eins og native app með fullskjásham.
         </p>
       </div>
 
