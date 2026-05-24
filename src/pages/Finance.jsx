@@ -1,7 +1,107 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, RefreshCw, ToggleLeft, ToggleRight } from 'lucide-react'
+
+const DEFAULT_SUBS = [
+  { id: '1', name: 'iCloud+', amount: 990, currency: 'ISK', cycle: 'monthly', active: true, icon: '☁️', category: 'Storage' },
+  { id: '2', name: 'The Athletic', amount: 890, currency: 'ISK', cycle: 'monthly', active: true, icon: '⚽', category: 'Sports' },
+  { id: '3', name: 'Netlify', amount: 2500, currency: 'ISK', cycle: 'monthly', active: true, icon: '🌐', category: 'Dev' },
+  { id: '4', name: 'Huel', amount: 8000, currency: 'ISK', cycle: 'monthly', active: true, icon: '🥤', category: 'Health' },
+  { id: '5', name: 'Calm', amount: 0, currency: 'ISK', cycle: 'yearly', active: false, icon: '🧘', category: 'Wellness' },
+]
+
+function SubscriptionsTab() {
+  const [subs, setSubs] = useLocalStorage('addi_subscriptions', DEFAULT_SUBS)
+  const [showAdd, setShowAdd] = useState(false)
+  const [form, setForm] = useState({ name: '', amount: '', icon: '💳', cycle: 'monthly', active: true, category: '' })
+
+  const active = subs.filter(s => s.active)
+  const monthly = active.reduce((acc, s) => acc + (s.cycle === 'yearly' ? s.amount / 12 : s.amount), 0)
+  const yearly = active.reduce((acc, s) => acc + (s.cycle === 'yearly' ? s.amount : s.amount * 12), 0)
+
+  const toggle = (id) => setSubs(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s))
+  const remove = (id) => setSubs(prev => prev.filter(s => s.id !== id))
+  const add = (e) => {
+    e.preventDefault()
+    if (!form.name || !form.amount) return
+    setSubs(prev => [...prev, { ...form, id: Date.now().toString(), amount: Number(form.amount) }])
+    setForm({ name: '', amount: '', icon: '💳', cycle: 'monthly', active: true, category: '' })
+    setShowAdd(false)
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="card flex justify-between items-center"
+           style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+        <div>
+          <div className="text-xs mb-0.5" style={{ color: 'var(--muted)' }}>Virkar áskriftir / mánuður</div>
+          <div className="text-2xl font-bold">{formatISK(Math.round(monthly))}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs mb-0.5" style={{ color: 'var(--muted)' }}>á ári</div>
+          <div className="text-lg font-semibold" style={{ color: 'var(--muted)' }}>{formatISK(Math.round(yearly))}</div>
+        </div>
+      </div>
+
+      <button onClick={() => setShowAdd(!showAdd)} className="btn btn-primary text-sm">
+        <Plus size={14} /> Bæta við áskrift
+      </button>
+
+      {showAdd && (
+        <form onSubmit={add} className="card flex flex-col gap-2 animate-slide-up">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-semibold text-sm">Ný áskrift</span>
+            <button type="button" onClick={() => setShowAdd(false)}><X size={15} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex gap-2">
+            <input className="input text-sm w-14 text-center" placeholder="🎯" value={form.icon}
+                   onChange={e => setForm(f => ({ ...f, icon: e.target.value }))} />
+            <input className="input text-sm flex-1" placeholder="Nafn" value={form.name}
+                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))} autoFocus />
+          </div>
+          <div className="flex gap-2">
+            <input className="input text-sm flex-1" type="number" placeholder="Upphæð (ISK)" value={form.amount}
+                   onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+            <select className="input text-sm w-32" value={form.cycle}
+                    onChange={e => setForm(f => ({ ...f, cycle: e.target.value }))}>
+              <option value="monthly">Mánuðarlegt</option>
+              <option value="yearly">Árlegt</option>
+            </select>
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center text-sm">Bæta við</button>
+        </form>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {subs.map(s => (
+          <div key={s.id} className="card flex items-center gap-3 py-3"
+               style={{ opacity: s.active ? 1 : 0.5 }}>
+            <div className="text-xl w-9 h-9 flex items-center justify-center rounded-xl shrink-0"
+                 style={{ background: 'var(--surface2)' }}>{s.icon}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm">{s.name}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                {formatISK(s.amount)} / {s.cycle === 'monthly' ? 'mán' : 'ár'}
+                {s.category && ` · ${s.category}`}
+              </div>
+            </div>
+            <button onClick={() => toggle(s.id)} className="shrink-0" title={s.active ? 'Gera óvirkt' : 'Virkja'}>
+              {s.active
+                ? <ToggleRight size={22} style={{ color: 'var(--accent)' }} />
+                : <ToggleLeft size={22} style={{ color: 'var(--muted)' }} />
+              }
+            </button>
+            <button onClick={() => remove(s.id)} style={{ color: 'var(--muted)' }}>
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -114,7 +214,7 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', 'Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
@@ -183,6 +283,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subscriptions' && <SubscriptionsTab />}
     </div>
   )
 }

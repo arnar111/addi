@@ -3,11 +3,13 @@ import { useLocalStorage } from './useLocalStorage'
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 export function useHabits() {
-  const [habits, setHabits] = useLocalStorage('addi_habits', [
-    { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+  const [habits, setHabits] = useLocalStorage('addi_habits_v2', [
+    { id: '1', name: 'Huel / Næring',  icon: '🥤', color: '#00d4aa', completions: [] },
+    { id: '2', name: 'Hreyfingarækt',  icon: '🏋️', color: '#8b5cf6', completions: [] },
+    { id: '3', name: '8 klst. svefn',  icon: '😴', color: '#3b82f6', completions: [] },
+    { id: '4', name: 'Drekka 2L vatn', icon: '💧', color: '#06b6d4', completions: [] },
+    { id: '5', name: 'Lesa 20 mín',    icon: '📚', color: '#f97316', completions: [] },
+    { id: '6', name: 'Senda umsókn',   icon: '💼', color: '#22c55e', completions: [] },
   ])
 
   const toggle = (id) => {
