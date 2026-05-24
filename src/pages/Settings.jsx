@@ -1,16 +1,28 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
+import { User, MapPin, Info, Trash2, Smartphone, Download, RefreshCw } from 'lucide-react'
+import { formatISK } from '../utils/currency'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const { monthlyTotal, monthlyIncome } = useFinance()
+  const { monthlyTotal: subMonthly, subs } = useSubscriptions()
 
   const clearData = () => {
-    if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum í Addi!')) return
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_incomes', 'addi_notes', 'addi_budget', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
+
+  const stats = [
+    { label: 'Útgjöld/mán', value: formatISK(monthlyTotal()) },
+    { label: 'Tekjur/mán', value: monthlyIncome() > 0 ? formatISK(monthlyIncome()) : '—' },
+    { label: 'Áskriftir/mán', value: formatISK(subMonthly()) },
+    { label: 'Fjöldi áskrifta', value: `${subs.filter(s => s.active).length}` },
+  ]
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
@@ -33,7 +45,25 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Veðurgögn sótt frá Open-Meteo (Reykjavík: 64.1°N, 21.9°W)
+          </p>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Info size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Þessi mánuður</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {stats.map(({ label, value }) => (
+            <div key={label} className="flex flex-col gap-0.5 p-3 rounded-xl" style={{ background: 'var(--surface2)' }}>
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>{label}</span>
+              <span className="font-semibold text-sm">{value}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -45,8 +75,8 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
-            ['Útgáfudagur', 'Maí 2026'],
+            ['Útgáfa', '2.0.0'],
+            ['Dagsetning', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
           ].map(([k, v]) => (
@@ -59,11 +89,16 @@ export default function Settings() {
       </div>
 
       {/* PWA install hint */}
-      <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+      <div className="card flex flex-col gap-2"
+           style={{ border: '1px solid rgba(0,212,170,0.2)', background: 'rgba(0,212,170,0.03)' }}>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá</span>
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          <strong style={{ color: 'var(--text)' }}>iPhone (Safari):</strong> Veldu deila-hnapp → "Bæta við heimaskjá"
+          {'\n'}
+          <strong style={{ color: 'var(--text)' }}>Android (Chrome):</strong> Þrípunktar → "Bæta við heimaskjá"
         </p>
       </div>
 
@@ -73,7 +108,10 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum — verkefnum, venjum, fjármálum og minnisblöðum.
+          Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>

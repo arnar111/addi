@@ -1,14 +1,20 @@
 import { useFinance } from '../../hooks/useFinance'
+import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { formatShortISK } from '../../utils/currency'
 import { Link } from 'react-router-dom'
-import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronRight, TrendingDown, TrendingUp, Repeat } from 'lucide-react'
 
 export default function FinanceSnapshotWidget() {
-  const { monthlyTotal, remaining, budget } = useFinance()
+  const { monthlyTotal, remaining, budget, monthlyIncome, savingsRate } = useFinance()
+  const { monthlyTotal: subMonthly } = useSubscriptions()
+
   const total = monthlyTotal()
   const left = remaining()
   const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
   const isOver = left < 0
+  const income = monthlyIncome()
+  const rate = savingsRate()
+  const subTotal = subMonthly()
 
   return (
     <div className="card">
@@ -26,10 +32,17 @@ export default function FinanceSnapshotWidget() {
             af {formatShortISK(budget.monthly)} fjárhagsáætlun
           </div>
         </div>
-        <div className={`flex items-center gap-1 text-sm font-medium`}
-             style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-          {isOver ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
-          {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+        <div className="flex flex-col items-end gap-1">
+          <div className={`flex items-center gap-1 text-sm font-medium`}
+               style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+            {isOver ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+            {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+          </div>
+          {income > 0 && (
+            <div className="text-xs" style={{ color: 'var(--accent)' }}>
+              {rate}% sparað
+            </div>
+          )}
         </div>
       </div>
 
@@ -40,7 +53,14 @@ export default function FinanceSnapshotWidget() {
                background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)',
              }} />
       </div>
-      <div className="text-xs mt-1 text-right" style={{ color: 'var(--muted)' }}>{pct}% notað</div>
+      <div className="flex justify-between text-xs mt-1.5" style={{ color: 'var(--muted)' }}>
+        <span>{pct}% notað</span>
+        {subTotal > 0 && (
+          <Link to="/finance" className="flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+            <Repeat size={10} /> {formatShortISK(subTotal)}/mán áskriftir
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
