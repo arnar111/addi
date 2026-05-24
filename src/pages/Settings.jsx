@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_lendo_bookings', 'addi_lendo_goal', 'addi_jobs', 'addi_spurs_matches', 'addi_spurs_next']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
