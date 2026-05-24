@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, CheckSquare, Wallet, FileText,
-  Timer, Settings, Layers, Trophy,
+  Timer, Settings, Layers, Trophy, Flame,
 } from 'lucide-react'
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/projects',  icon: Layers,          label: 'Forrit' },
   { to: '/finance',   icon: Wallet,          label: 'Fjármál' },
   { to: '/football',  icon: Trophy,          label: 'Fótbolti' },
+  { to: '/habits',    icon: Flame,           label: 'Vanur' },
   { to: '/notes',     icon: FileText,        label: 'Minnisblöð' },
   { to: '/timer',     icon: Timer,           label: 'Tímari' },
   { to: '/settings',  icon: Settings,        label: 'Stillingar' },

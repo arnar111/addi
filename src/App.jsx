@@ -9,6 +9,7 @@ import Timer from './pages/Timer'
 import Settings from './pages/Settings'
 import Projects from './pages/Projects'
 import Football from './pages/Football'
+import Habits from './pages/Habits'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/football" element={<Football />} />
+            <Route path="/habits" element={<Habits />} />
           </Routes>
         </div>
       </main>

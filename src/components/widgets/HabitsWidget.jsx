@@ -1,5 +1,6 @@
 import { useHabits } from '../../hooks/useHabits'
-import { Flame } from 'lucide-react'
+import { Flame, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function HabitsWidget() {
   const { habits, toggle, isDoneToday, streakFor, todayDone } = useHabits()
@@ -8,9 +9,14 @@ export default function HabitsWidget() {
     <div className="card">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">Vanur</h3>
-        <span className="badge" style={{ background: 'rgba(0,212,170,0.12)', color: 'var(--accent)' }}>
-          {todayDone}/{habits.length}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="badge" style={{ background: 'rgba(0,212,170,0.12)', color: 'var(--accent)' }}>
+            {todayDone}/{habits.length}
+          </span>
+          <Link to="/habits" className="flex items-center gap-0.5 text-xs" style={{ color: 'var(--accent)' }}>
+            <ChevronRight size={12} />
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
