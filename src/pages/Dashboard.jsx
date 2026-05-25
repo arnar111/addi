@@ -1,11 +1,53 @@
 import { useState, useEffect } from 'react'
 import { getGreeting, formatTime, formatDate } from '../utils/time'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import WeatherWidget from '../components/widgets/WeatherWidget'
 import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
-import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import SportsWidget from '../components/widgets/SportsWidget'
+
+function WoltPassTracker() {
+  const today = new Date().toISOString().split('T')[0]
+  const [usedDays, setUsedDays] = useLocalStorage('addi_wolt_used', [])
+  const usedToday = usedDays.includes(today)
+
+  const toggle = () => {
+    if (usedToday) {
+      setUsedDays(prev => prev.filter(d => d !== today))
+    } else {
+      setUsedDays(prev => [...prev, today])
+    }
+  }
+
+  const thisMonth = usedDays.filter(d => d.startsWith(today.slice(0, 7))).length
+
+  return (
+    <button onClick={toggle} className="card flex items-center gap-3 w-full text-left transition-all"
+      style={{
+        border: `1px solid ${usedToday ? 'rgba(0,212,170,0.3)' : 'var(--border)'}`,
+        background: usedToday ? 'rgba(0,212,170,0.05)' : 'var(--surface)',
+      }}>
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0"
+           style={{ background: 'rgba(0,212,170,0.1)' }}>
+        🛵
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium">Wolt Dagspassinn</div>
+        <div className="text-xs" style={{ color: 'var(--muted)' }}>
+          {usedToday
+            ? `✓ Notaður í dag · ${thisMonth}× þennan mánuð`
+            : `Ekki notaður ennþá · ${thisMonth}× þennan mánuð`}
+        </div>
+      </div>
+      <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition-all"
+           style={{ background: usedToday ? 'var(--accent)' : 'var(--surface2)', color: usedToday ? '#000' : 'var(--muted)' }}>
+        {usedToday ? '✓' : ''}
+      </div>
+    </button>
+  )
+}
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -30,8 +72,11 @@ export default function Dashboard() {
       {/* Weather */}
       <WeatherWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* Wolt daily pass */}
+      <WoltPassTracker />
+
+      {/* Sports */}
+      <SportsWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
