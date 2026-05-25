@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp } from 'lucide-react'
+
+const INCOME_SOURCES = [
+  { id: 'lendo', label: 'Lendo leiga', icon: '🏠', color: '#8b5cf6' },
+  { id: 'salary', label: 'Laun', icon: '💼', color: '#00d4aa' },
+  { id: 'freelance', label: 'Freelance', icon: '💻', color: '#3b82f6' },
+  { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
+]
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -25,19 +32,29 @@ function CategoryBar({ cat, spent, budget }) {
 }
 
 export default function Finance() {
-  const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const {
+    addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses,
+    addIncome, removeIncome, income, monthlyIncome,
+  } = useFinance()
+
   const [showForm, setShowForm] = useState(false)
+  const [showIncomeForm, setShowIncomeForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
+  const [incomeAmount, setIncomeAmount] = useState('')
+  const [incomeSource, setIncomeSource] = useState('lendo')
+  const [incomeNote, setIncomeNote] = useState('')
   const [tab, setTab] = useState('overview')
 
   const total = monthlyTotal()
   const cats = byCategory()
   const left = remaining()
+  const totalIncome = monthlyIncome()
   const isOver = left < 0
   const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const netBalance = totalIncome - total
 
   const handleAdd = (e) => {
     e.preventDefault()
@@ -48,6 +65,21 @@ export default function Finance() {
     setShowForm(false)
   }
 
+  const handleAddIncome = (e) => {
+    e.preventDefault()
+    if (!incomeAmount || isNaN(Number(incomeAmount))) return
+    addIncome(Number(incomeAmount), incomeSource, incomeNote)
+    setIncomeAmount('')
+    setIncomeNote('')
+    setShowIncomeForm(false)
+  }
+
+  const thisMonthIncome = income.filter(i => {
+    const d = new Date(i.date)
+    const now = new Date()
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+  })
+
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="flex items-center justify-between px-1 pt-2">
@@ -57,22 +89,34 @@ export default function Finance() {
             {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
-          <Plus size={16} /> Gjald
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => { setShowIncomeForm(!showIncomeForm); setShowForm(false) }}
+            className="btn btn-ghost text-sm" style={{ color: 'var(--success)', borderColor: 'rgba(34,197,94,0.3)' }}>
+            <Plus size={15} /> Tekjur
+          </button>
+          <button onClick={() => { setShowForm(!showForm); setShowIncomeForm(false) }} className="btn btn-primary">
+            <Plus size={16} /> Gjald
+          </button>
+        </div>
       </div>
 
       {/* Overview card */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
-        <div className="flex justify-between items-start mb-4">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           <div>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
-            <div className="text-3xl font-semibold">{formatISK(total)}</div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld</div>
+            <div className="text-xl font-semibold">{formatShortISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
-            <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-              {isOver ? '-' : ''}{formatISK(Math.abs(left))}
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Tekjur</div>
+            <div className="text-xl font-semibold" style={{ color: 'var(--success)' }}>
+              {formatShortISK(totalIncome)}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Nettó</div>
+            <div className="text-xl font-semibold" style={{ color: netBalance >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+              {netBalance >= 0 ? '+' : ''}{formatShortISK(netBalance)}
             </div>
           </div>
         </div>
@@ -81,12 +125,43 @@ export default function Finance() {
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)' }} />
         </div>
         <div className="flex justify-between text-xs" style={{ color: 'var(--muted)' }}>
-          <span>{pct}% notað</span>
-          <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
+          <span>{pct}% af fjárhagsáætlun notað</span>
+          <span>{formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}</span>
         </div>
       </div>
 
-      {/* Add expense form */}
+      {/* Income form */}
+      {showIncomeForm && (
+        <form onSubmit={handleAddIncome} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm" style={{ color: 'var(--success)' }}>Bæta við tekjum</h3>
+            <button type="button" onClick={() => setShowIncomeForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <input className="input" type="number" placeholder="Upphæð (ISK)" value={incomeAmount}
+            onChange={e => setIncomeAmount(e.target.value)} autoFocus />
+          <input className="input" placeholder="Skýring (valkvæmt)" value={incomeNote}
+            onChange={e => setIncomeNote(e.target.value)} />
+          <div className="grid grid-cols-4 gap-1.5">
+            {INCOME_SOURCES.map(s => (
+              <button key={s.id} type="button" onClick={() => setIncomeSource(s.id)}
+                className="flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs transition-all"
+                style={{
+                  background: incomeSource === s.id ? `${s.color}22` : 'var(--surface2)',
+                  border: `1px solid ${incomeSource === s.id ? s.color + '55' : 'transparent'}`,
+                }}>
+                <span>{s.icon}</span>
+                <span style={{ color: incomeSource === s.id ? s.color : 'var(--muted)', fontSize: 10 }}>{s.label}</span>
+              </button>
+            ))}
+          </div>
+          <button type="submit" className="btn w-full justify-center"
+            style={{ background: 'rgba(34,197,94,0.15)', color: 'var(--success)', border: '1px solid rgba(34,197,94,0.3)' }}>
+            Bæta við tekjum
+          </button>
+        </form>
+      )}
+
+      {/* Expense form */}
       {showForm && (
         <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
           <div className="flex items-center justify-between">
@@ -114,7 +189,7 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Gjöld'], ['income', 'Tekjur']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
@@ -181,6 +256,48 @@ export default function Finance() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {tab === 'income' && (
+        <div className="flex flex-col gap-2">
+          {thisMonthIncome.length === 0 ? (
+            <div className="card text-center py-8 flex flex-col gap-2 items-center" style={{ color: 'var(--muted)' }}>
+              <span className="text-2xl">🏠</span>
+              <div>Engar tekjur skráðar þennan mánuð</div>
+              <div className="text-xs">Skráðu Lendo leigutekjur hér</div>
+            </div>
+          ) : (
+            <>
+              <div className="card flex items-center justify-between py-3">
+                <div>
+                  <div className="text-xs" style={{ color: 'var(--muted)' }}>Heildartekjur þessa mánaðar</div>
+                  <div className="text-xl font-semibold" style={{ color: 'var(--success)' }}>
+                    {formatISK(totalIncome)}
+                  </div>
+                </div>
+                <TrendingUp size={24} style={{ color: 'var(--success)' }} />
+              </div>
+              {thisMonthIncome.map(i => {
+                const src = INCOME_SOURCES.find(s => s.id === i.source) || INCOME_SOURCES[3]
+                return (
+                  <div key={i.id} className="card flex items-center gap-3 py-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
+                         style={{ background: `${src.color}22` }}>{src.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium" style={{ color: 'var(--success)' }}>+{formatISK(i.amount)}</div>
+                      <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                        {src.label}{i.note ? ` · ${i.note}` : ''} · {new Date(i.date).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                    <button onClick={() => removeIncome(i.id)} style={{ color: 'var(--muted)' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )
+              })}
+            </>
+          )}
         </div>
       )}
     </div>
