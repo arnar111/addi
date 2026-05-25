@@ -8,6 +8,7 @@ export function useHabits() {
     { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
     { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
     { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+    { id: '5', name: 'Garðurinn', icon: '🌱', color: '#22c55e', completions: [] },
   ])
 
   const toggle = (id) => {
