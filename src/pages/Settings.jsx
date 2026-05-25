@@ -2,12 +2,12 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
 
 export default function Settings() {
-  const [name, setName] = useLocalStorage('addi_name', 'Arnar')
-  const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [name, setName] = useLocalStorage('addi_name', 'Addi')
+  const [city, setCity] = useLocalStorage('addi_city', 'Garðabær')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_income']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +33,7 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Garðabæ</p>
         </div>
       </div>
 
