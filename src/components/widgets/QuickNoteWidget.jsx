@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNotes } from '../../hooks/useNotes'
-import { StickyNote, Plus, Pin } from 'lucide-react'
+import { Plus, Pin, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function QuickNoteWidget() {
@@ -9,6 +9,7 @@ export default function QuickNoteWidget() {
 
   const handleAdd = (e) => {
     e.preventDefault()
+    if (!text.trim()) return
     add(text)
     setText('')
   }
@@ -18,8 +19,10 @@ export default function QuickNoteWidget() {
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold text-sm">Skýringar</h3>
-        <Link to="/notes" className="text-xs" style={{ color: 'var(--accent)' }}>Sjá allt</Link>
+        <h3 className="font-semibold text-sm">Minnismiðar</h3>
+        <Link to="/notes" className="flex items-center gap-0.5 text-xs" style={{ color: 'var(--accent)' }}>
+          Sjá allt <ChevronRight size={12} />
+        </Link>
       </div>
 
       <form onSubmit={handleAdd} className="flex gap-2 mb-3">
@@ -29,7 +32,7 @@ export default function QuickNoteWidget() {
           value={text}
           onChange={e => setText(e.target.value)}
         />
-        <button type="submit" className="btn btn-primary shrink-0" style={{ padding: '8px 12px' }}>
+        <button type="submit" className="btn btn-primary shrink-0" style={{ padding: '9px 13px' }}>
           <Plus size={16} />
         </button>
       </form>

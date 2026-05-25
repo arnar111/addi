@@ -3,7 +3,7 @@ import { useLocalStorage } from './useLocalStorage'
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
-    monthly: 400000,
+    monthly: 450000,
     categories: {
       food: 80000,
       transport: 30000,
@@ -11,7 +11,8 @@ export function useFinance() {
       entertainment: 30000,
       health: 20000,
       shopping: 40000,
-      subscriptions: 15000,
+      subscriptions: 25000,
+      nicotine: 10000,
       other: 35000,
     }
   })
@@ -41,9 +42,8 @@ export function useFinance() {
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
 
   const byCategory = () => {
-    const m = currentMonth()
     const result = {}
-    m.forEach(e => {
+    currentMonth().forEach(e => {
       result[e.category] = (result[e.category] || 0) + e.amount
     })
     return result
@@ -51,7 +51,7 @@ export function useFinance() {
 
   const remaining = () => budget.monthly - monthlyTotal()
 
-  const recentExpenses = expenses.slice(0, 20)
+  const recentExpenses = expenses.slice(0, 30)
 
   return {
     expenses, addExpense, removeExpense,

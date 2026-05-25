@@ -1,22 +1,23 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, CreditCard, ToggleLeft, ToggleRight } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
-  const isOver = spent > budget
+  const isOver = budget > 0 && spent > budget
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span>{cat.icon} {cat.label}</span>
-        <span style={{ color: isOver ? 'var(--danger)' : 'var(--muted)' }}>
+        <span className="flex items-center gap-1.5">{cat.icon} {cat.label}</span>
+        <span style={{ color: isOver ? 'var(--danger)' : 'var(--text2)' }}>
           {formatShortISK(spent)} {budget ? `/ ${formatShortISK(budget)}` : ''}
         </span>
       </div>
       {budget > 0 && (
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
-          <div className="h-full rounded-full"
+          <div className="h-full rounded-full transition-all duration-500"
                style={{ width: `${pct}%`, background: isOver ? 'var(--danger)' : cat.color }} />
         </div>
       )}
@@ -24,8 +25,40 @@ function CategoryBar({ cat, spent, budget }) {
   )
 }
 
+function SubCard({ sub, onToggle }) {
+  return (
+    <div
+      className="flex items-center gap-3 p-3 rounded-xl"
+      style={{
+        background: sub.active ? 'var(--surface2)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${sub.active ? 'var(--border)' : 'var(--border)'}`,
+        opacity: sub.active ? 1 : 0.5,
+      }}
+    >
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+        style={{ background: `${sub.color}18` }}
+      >
+        {sub.icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium truncate">{sub.name}</div>
+        <div className="text-xs" style={{ color: 'var(--muted)' }}>
+          {formatISK(sub.amountISK)}/{sub.period === 'yearly' ? 'ár' : 'mán'}
+          {sub.period === 'yearly' && ` · ${formatISK(Math.round(sub.amountISK / 12))}/mán`}
+        </div>
+      </div>
+      <button onClick={() => onToggle(sub.id)} style={{ color: sub.active ? 'var(--accent)' : 'var(--muted)' }}>
+        {sub.active ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
+      </button>
+    </div>
+  )
+}
+
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { subs, toggle: toggleSub, monthlyTotal: subMonthly, yearlyTotal: subYearly } = useSubscriptions()
+
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
@@ -38,6 +71,7 @@ export default function Finance() {
   const left = remaining()
   const isOver = left < 0
   const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
+  const subTotal = subMonthly()
 
   const handleAdd = (e) => {
     e.preventDefault()
@@ -50,10 +84,10 @@ export default function Finance() {
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
-      <div className="flex items-center justify-between px-1 pt-2">
+      <div className="flex items-center justify-between px-1 pt-4">
         <div>
           <h1 className="text-xl font-semibold">Fjármál</h1>
-          <p className="text-sm" style={{ color: 'var(--muted)' }}>
+          <p className="text-sm" style={{ color: 'var(--text2)' }}>
             {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
           </p>
         </div>
@@ -67,11 +101,11 @@ export default function Finance() {
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
-            <div className="text-3xl font-semibold">{formatISK(total)}</div>
+            <div className="text-3xl font-semibold tracking-tight">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
+          <div className="flex flex-col items-end">
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
-            <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+            <div className="text-xl font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
             </div>
           </div>
@@ -84,6 +118,12 @@ export default function Finance() {
           <span>{pct}% notað</span>
           <span>Fjárhagsáætlun: {formatISK(budget.monthly)}</span>
         </div>
+
+        {/* Subscription cost note */}
+        <div className="mt-3 pt-3 flex items-center justify-between text-xs" style={{ borderTop: '1px solid var(--border)' }}>
+          <span style={{ color: 'var(--muted)' }}>📱 Áskriftir á mánuði</span>
+          <span className="font-semibold" style={{ color: 'var(--accent2)' }}>{formatISK(subTotal)}</span>
+        </div>
       </div>
 
       {/* Add expense form */}
@@ -93,17 +133,19 @@ export default function Finance() {
             <h3 className="font-semibold text-sm">Bæta við gjaldi</h3>
             <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
           </div>
-          <input className="input" type="number" placeholder="Upphæð (ISK)" value={amount} onChange={e => setAmount(e.target.value)} autoFocus />
-          <input className="input" placeholder="Skýring (valkvæmt)" value={note} onChange={e => setNote(e.target.value)} />
-          <div className="grid grid-cols-4 gap-1.5">
+          <input className="input" type="number" placeholder="Upphæð (ISK)" value={amount}
+            onChange={e => setAmount(e.target.value)} autoFocus />
+          <input className="input" placeholder="Skýring (valkvæmt)" value={note}
+            onChange={e => setNote(e.target.value)} />
+          <div className="grid grid-cols-3 gap-2">
             {EXPENSE_CATEGORIES.map(c => (
               <button key={c.id} type="button" onClick={() => setCategory(c.id)}
-                className="flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs transition-all"
+                className="flex flex-col items-center gap-1 py-2.5 rounded-xl text-xs transition-all"
                 style={{
-                  background: category === c.id ? `${c.color}22` : 'var(--surface2)',
-                  border: `1px solid ${category === c.id ? c.color + '55' : 'transparent'}`,
+                  background: category === c.id ? `${c.color}1a` : 'var(--surface2)',
+                  border: `1px solid ${category === c.id ? c.color + '44' : 'transparent'}`,
                 }}>
-                <span>{c.icon}</span>
+                <span className="text-base">{c.icon}</span>
                 <span style={{ color: category === c.id ? c.color : 'var(--muted)', fontSize: 10 }}>{c.label}</span>
               </button>
             ))}
@@ -113,15 +155,9 @@ export default function Finance() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
-          <button key={t} onClick={() => setTab(t)}
-            className="btn text-sm flex-1 justify-center"
-            style={{
-              background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
-              color: tab === t ? 'var(--accent)' : 'var(--muted)',
-              border: `1px solid ${tab === t ? 'rgba(0,212,170,0.25)' : 'var(--border)'}`,
-            }}>{l}</button>
+      <div className="tab-strip">
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subs', '📱 Áskriftir']].map(([t, l]) => (
+          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>{l}</button>
         ))}
       </div>
 
@@ -130,16 +166,15 @@ export default function Finance() {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm">Eftir flokkum</h3>
             <button onClick={() => setShowBudgetEdit(!showBudgetEdit)} className="text-xs" style={{ color: 'var(--accent)' }}>
-              Breyta fjárhagsáætlun
+              {showBudgetEdit ? 'Loka' : 'Breyta áætlun'}
             </button>
           </div>
           {showBudgetEdit && (
             <div className="flex flex-col gap-2 p-3 rounded-xl" style={{ background: 'var(--surface2)' }}>
               <div className="text-xs font-medium mb-1" style={{ color: 'var(--muted)' }}>Mánaðarleg fjárhagsáætlun (ISK)</div>
-              <input className="input text-sm" type="number"
-                value={budget.monthly}
+              <input className="input text-sm" type="number" value={budget.monthly}
                 onChange={e => setBudget(b => ({ ...b, monthly: Number(e.target.value) }))} />
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 mt-2">
                 {EXPENSE_CATEGORIES.map(c => (
                   <div key={c.id} className="flex flex-col gap-0.5">
                     <label className="text-xs" style={{ color: 'var(--muted)' }}>{c.icon} {c.label}</label>
@@ -153,7 +188,7 @@ export default function Finance() {
           )}
           <div className="flex flex-col gap-3">
             {EXPENSE_CATEGORIES.map(c => (
-              <CategoryBar key={c.id} cat={c} spent={cats[c.id] || 0} budget={budget.categories[c.id]} />
+              <CategoryBar key={c.id} cat={c} spent={cats[c.id] || 0} budget={budget.categories?.[c.id]} />
             ))}
           </div>
         </div>
@@ -162,13 +197,16 @@ export default function Finance() {
       {tab === 'transactions' && (
         <div className="flex flex-col gap-2">
           {recentExpenses.length === 0 ? (
-            <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>Engar færslur ennþá</div>
+            <div className="card text-center py-10" style={{ color: 'var(--muted)' }}>
+              <div className="text-3xl mb-2">💳</div>
+              <p>Engar færslur ennþá</p>
+            </div>
           ) : recentExpenses.map(e => {
-            const cat = EXPENSE_CATEGORIES.find(c => c.id === e.category) || EXPENSE_CATEGORIES[7]
+            const cat = EXPENSE_CATEGORIES.find(c => c.id === e.category) || EXPENSE_CATEGORIES[8]
             return (
               <div key={e.id} className="card flex items-center gap-3 py-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
-                     style={{ background: `${cat.color}22` }}>{cat.icon}</div>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                     style={{ background: `${cat.color}1a` }}>{cat.icon}</div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium">{formatISK(e.amount)}</div>
                   <div className="text-xs" style={{ color: 'var(--muted)' }}>
@@ -181,6 +219,29 @@ export default function Finance() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {tab === 'subs' && (
+        <div className="flex flex-col gap-3">
+          <div className="card flex justify-between items-center">
+            <div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Samtals á mánuði</div>
+              <div className="text-2xl font-bold" style={{ color: 'var(--accent2)' }}>{formatISK(subTotal)}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Á ári</div>
+              <div className="text-lg font-semibold">{formatISK(subYearly())}</div>
+            </div>
+          </div>
+
+          {subs.map(s => (
+            <SubCard key={s.id} sub={s} onToggle={toggleSub} />
+          ))}
+
+          <p className="text-xs text-center mt-2" style={{ color: 'var(--muted)' }}>
+            Slökktu á áskrift til að taka hana út úr reikninginn
+          </p>
         </div>
       )}
     </div>
