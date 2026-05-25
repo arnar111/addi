@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useIncome, INCOME_SOURCES } from '../hooks/useIncome'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, TrendingDown, TrendingUp } from 'lucide-react'
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -26,12 +27,19 @@ function CategoryBar({ cat, spent, budget }) {
 
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
-  const [showForm, setShowForm] = useState(false)
+  const { add: addIncome, remove: removeIncome, goal, setGoal, monthlyTotal: incomeTotal, bySource, recent: recentIncome } = useIncome()
+
+  const [showExpForm, setShowExpForm] = useState(false)
+  const [showIncForm, setShowIncForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
+  const [incAmount, setIncAmount] = useState('')
+  const [incSource, setIncSource] = useState('lendo')
+  const [incNote, setIncNote] = useState('')
   const [tab, setTab] = useState('overview')
+  const [subtab, setSubtab] = useState('expense')
 
   const total = monthlyTotal()
   const cats = byCategory()
@@ -39,13 +47,22 @@ export default function Finance() {
   const isOver = left < 0
   const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
 
-  const handleAdd = (e) => {
+  const income = incomeTotal()
+  const net = income - total
+  const incBySrc = bySource()
+
+  const handleAddExpense = (e) => {
     e.preventDefault()
     if (!amount || isNaN(Number(amount))) return
     addExpense(Number(amount), category, note)
-    setAmount('')
-    setNote('')
-    setShowForm(false)
+    setAmount(''); setNote(''); setShowExpForm(false)
+  }
+
+  const handleAddIncome = (e) => {
+    e.preventDefault()
+    if (!incAmount || isNaN(Number(incAmount))) return
+    addIncome(Number(incAmount), incSource, incNote)
+    setIncAmount(''); setIncNote(''); setShowIncForm(false)
   }
 
   return (
@@ -57,21 +74,47 @@ export default function Finance() {
             {new Date().toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
-          <Plus size={16} /> Gjald
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => { setShowIncForm(!showIncForm); setShowExpForm(false) }}
+            className="btn text-sm"
+            style={{ background: 'rgba(34,197,94,0.12)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.25)' }}>
+            <TrendingUp size={14} /> Tekjur
+          </button>
+          <button onClick={() => { setShowExpForm(!showExpForm); setShowIncForm(false) }}
+            className="btn btn-primary text-sm">
+            <Plus size={14} /> Gjald
+          </button>
+        </div>
       </div>
 
-      {/* Overview card */}
+      {/* Net position overview */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="card-sm text-center">
+          <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Tekjur</div>
+          <div className="text-base font-bold" style={{ color: '#22c55e' }}>{formatShortISK(income)}</div>
+        </div>
+        <div className="card-sm text-center">
+          <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Gjöld</div>
+          <div className="text-base font-bold" style={{ color: '#ef4444' }}>{formatShortISK(total)}</div>
+        </div>
+        <div className="card-sm text-center">
+          <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Nettó</div>
+          <div className="text-base font-bold" style={{ color: net >= 0 ? '#22c55e' : '#ef4444' }}>
+            {net >= 0 ? '+' : ''}{formatShortISK(net)}
+          </div>
+        </div>
+      </div>
+
+      {/* Expense overview card */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>
             <div className="text-3xl font-semibold">{formatISK(total)}</div>
           </div>
-          <div className={`flex flex-col items-end`}>
-            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Eftir</div>
-            <div className="text-lg font-semibold" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+          <div>
+            <div className="text-xs mb-1 text-right" style={{ color: 'var(--muted)' }}>Eftir</div>
+            <div className="text-lg font-semibold text-right" style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
               {isOver ? '-' : ''}{formatISK(Math.abs(left))}
             </div>
           </div>
@@ -87,11 +130,11 @@ export default function Finance() {
       </div>
 
       {/* Add expense form */}
-      {showForm && (
-        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+      {showExpForm && (
+        <form onSubmit={handleAddExpense} className="card flex flex-col gap-3 animate-slide-up">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Bæta við gjaldi</h3>
-            <button type="button" onClick={() => setShowForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+            <h3 className="font-semibold text-sm">Skrá gjald</h3>
+            <button type="button" onClick={() => setShowExpForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
           </div>
           <input className="input" type="number" placeholder="Upphæð (ISK)" value={amount} onChange={e => setAmount(e.target.value)} autoFocus />
           <input className="input" placeholder="Skýring (valkvæmt)" value={note} onChange={e => setNote(e.target.value)} />
@@ -108,11 +151,41 @@ export default function Finance() {
               </button>
             ))}
           </div>
-          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+          <button type="submit" className="btn btn-primary w-full justify-center">Skrá gjald</button>
         </form>
       )}
 
-      {/* Tabs */}
+      {/* Add income form */}
+      {showIncForm && (
+        <form onSubmit={handleAddIncome} className="card flex flex-col gap-3 animate-slide-up"
+              style={{ borderColor: 'rgba(34,197,94,0.25)' }}>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Skrá tekjur</h3>
+            <button type="button" onClick={() => setShowIncForm(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <input className="input" type="number" placeholder="Upphæð (ISK)" value={incAmount} onChange={e => setIncAmount(e.target.value)} autoFocus />
+          <input className="input" placeholder="Skýring (valkvæmt)" value={incNote} onChange={e => setIncNote(e.target.value)} />
+          <div className="grid grid-cols-3 gap-1.5">
+            {INCOME_SOURCES.map(s => (
+              <button key={s.id} type="button" onClick={() => setIncSource(s.id)}
+                className="flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs transition-all"
+                style={{
+                  background: incSource === s.id ? `${s.color}22` : 'var(--surface2)',
+                  border: `1px solid ${incSource === s.id ? s.color + '55' : 'transparent'}`,
+                }}>
+                <span>{s.icon}</span>
+                <span style={{ color: incSource === s.id ? s.color : 'var(--muted)', fontSize: 10 }}>{s.label}</span>
+              </button>
+            ))}
+          </div>
+          <button type="submit" className="btn w-full justify-center"
+                  style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.3)' }}>
+            Skrá tekjur
+          </button>
+        </form>
+      )}
+
+      {/* Main tabs */}
       <div className="flex gap-2">
         {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
@@ -126,62 +199,136 @@ export default function Finance() {
       </div>
 
       {tab === 'overview' && (
-        <div className="card flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Eftir flokkum</h3>
-            <button onClick={() => setShowBudgetEdit(!showBudgetEdit)} className="text-xs" style={{ color: 'var(--accent)' }}>
-              Breyta fjárhagsáætlun
-            </button>
-          </div>
-          {showBudgetEdit && (
-            <div className="flex flex-col gap-2 p-3 rounded-xl" style={{ background: 'var(--surface2)' }}>
-              <div className="text-xs font-medium mb-1" style={{ color: 'var(--muted)' }}>Mánaðarleg fjárhagsáætlun (ISK)</div>
-              <input className="input text-sm" type="number"
-                value={budget.monthly}
-                onChange={e => setBudget(b => ({ ...b, monthly: Number(e.target.value) }))} />
-              <div className="grid grid-cols-2 gap-2">
-                {EXPENSE_CATEGORIES.map(c => (
-                  <div key={c.id} className="flex flex-col gap-0.5">
-                    <label className="text-xs" style={{ color: 'var(--muted)' }}>{c.icon} {c.label}</label>
-                    <input className="input text-xs py-1.5" type="number"
-                      value={budget.categories[c.id] || ''}
-                      onChange={e => setBudget(b => ({ ...b, categories: { ...b.categories, [c.id]: Number(e.target.value) } }))} />
-                  </div>
-                ))}
+        <>
+          {/* Income by source */}
+          {income > 0 && (
+            <div className="card flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Tekjur eftir uppruna</h3>
+                <span className="text-sm font-semibold" style={{ color: '#22c55e' }}>{formatISK(income)}</span>
               </div>
+              {INCOME_SOURCES.map(s => {
+                const amt = incBySrc[s.id] || 0
+                if (!amt) return null
+                const pct = Math.round((amt / income) * 100)
+                return (
+                  <div key={s.id} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>{s.icon} {s.label}</span>
+                      <span style={{ color: 'var(--muted)' }}>{formatShortISK(amt)} ({pct}%)</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: s.color }} />
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
-          <div className="flex flex-col gap-3">
-            {EXPENSE_CATEGORIES.map(c => (
-              <CategoryBar key={c.id} cat={c} spent={cats[c.id] || 0} budget={budget.categories[c.id]} />
-            ))}
+
+          {/* Expenses by category */}
+          <div className="card flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm">Gjöld eftir flokkum</h3>
+              <button onClick={() => setShowBudgetEdit(!showBudgetEdit)} className="text-xs" style={{ color: 'var(--accent)' }}>
+                Fjárhagsáætlun
+              </button>
+            </div>
+            {showBudgetEdit && (
+              <div className="flex flex-col gap-2 p-3 rounded-xl" style={{ background: 'var(--surface2)' }}>
+                <div className="text-xs font-medium mb-1" style={{ color: 'var(--muted)' }}>Mánaðarleg fjárhagsáætlun (ISK)</div>
+                <input className="input text-sm" type="number"
+                  value={budget.monthly}
+                  onChange={e => setBudget(b => ({ ...b, monthly: Number(e.target.value) }))} />
+                <div className="grid grid-cols-2 gap-2">
+                  {EXPENSE_CATEGORIES.map(c => (
+                    <div key={c.id} className="flex flex-col gap-0.5">
+                      <label className="text-xs" style={{ color: 'var(--muted)' }}>{c.icon} {c.label}</label>
+                      <input className="input text-xs py-1.5" type="number"
+                        value={budget.categories[c.id] || ''}
+                        onChange={e => setBudget(b => ({ ...b, categories: { ...b.categories, [c.id]: Number(e.target.value) } }))} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-col gap-3">
+              {EXPENSE_CATEGORIES.map(c => (
+                <CategoryBar key={c.id} cat={c} spent={cats[c.id] || 0} budget={budget.categories[c.id]} />
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {tab === 'transactions' && (
-        <div className="flex flex-col gap-2">
-          {recentExpenses.length === 0 ? (
-            <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>Engar færslur ennþá</div>
-          ) : recentExpenses.map(e => {
-            const cat = EXPENSE_CATEGORIES.find(c => c.id === e.category) || EXPENSE_CATEGORIES[7]
-            return (
-              <div key={e.id} className="card flex items-center gap-3 py-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
-                     style={{ background: `${cat.color}22` }}>{cat.icon}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium">{formatISK(e.amount)}</div>
-                  <div className="text-xs" style={{ color: 'var(--muted)' }}>
-                    {cat.label}{e.note ? ` · ${e.note}` : ''} · {new Date(e.date).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+        <>
+          {/* Sub-tabs */}
+          <div className="flex gap-2">
+            {[['expense', '⬇ Gjöld'], ['income', '⬆ Tekjur']].map(([t, l]) => (
+              <button key={t} onClick={() => setSubtab(t)}
+                className="btn text-xs flex-1 justify-center py-1.5"
+                style={{
+                  background: subtab === t ? (t === 'income' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)') : 'var(--surface)',
+                  color: subtab === t ? (t === 'income' ? '#22c55e' : '#ef4444') : 'var(--muted)',
+                  border: `1px solid ${subtab === t ? (t === 'income' ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.2)') : 'var(--border)'}`,
+                }}>{l}</button>
+            ))}
+          </div>
+
+          {subtab === 'expense' && (
+            <div className="flex flex-col gap-2">
+              {recentExpenses.length === 0 ? (
+                <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>Engar gjaldafærslur</div>
+              ) : recentExpenses.map(e => {
+                const cat = EXPENSE_CATEGORIES.find(c => c.id === e.category) || EXPENSE_CATEGORIES[7]
+                return (
+                  <div key={e.id} className="card flex items-center gap-3 py-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
+                         style={{ background: `${cat.color}22` }}>{cat.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium">{formatISK(e.amount)}</div>
+                      <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                        {cat.label}{e.note ? ` · ${e.note}` : ''} · {new Date(e.date).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                    <button onClick={() => removeExpense(e.id)} style={{ color: 'var(--muted)' }}>
+                      <Trash2 size={14} />
+                    </button>
                   </div>
+                )
+              })}
+            </div>
+          )}
+
+          {subtab === 'income' && (
+            <div className="flex flex-col gap-2">
+              {recentIncome.length === 0 ? (
+                <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>
+                  <p>Engar tekjufærslur</p>
+                  <p className="text-xs mt-1">Skráðu fyrsta tekjuna þína!</p>
                 </div>
-                <button onClick={() => removeExpense(e.id)} style={{ color: 'var(--muted)' }}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            )
-          })}
-        </div>
+              ) : recentIncome.map(e => {
+                const src = INCOME_SOURCES.find(s => s.id === e.source) || INCOME_SOURCES[4]
+                return (
+                  <div key={e.id} className="card flex items-center gap-3 py-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
+                         style={{ background: `${src.color}22` }}>{src.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium" style={{ color: '#22c55e' }}>+{formatISK(e.amount)}</div>
+                      <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                        {src.label}{e.note ? ` · ${e.note}` : ''} · {new Date(e.date).toLocaleDateString('is-IS', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                    <button onClick={() => removeIncome(e.id)} style={{ color: 'var(--muted)' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -27,7 +27,7 @@ const WEATHER_CODES = {
   99: { label: 'Thunderstorm', icon: '⛈️' },
 }
 
-export function useWeather(lat = 64.1355, lon = -21.8954) {
+export function useWeather(lat = 64.089, lon = -22.014) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
