@@ -1,30 +1,30 @@
 import { useState, useEffect } from 'react'
 
 const WEATHER_CODES = {
-  0: { label: 'Clear', icon: '☀️' },
-  1: { label: 'Mostly Clear', icon: '🌤️' },
-  2: { label: 'Partly Cloudy', icon: '⛅' },
-  3: { label: 'Overcast', icon: '☁️' },
-  45: { label: 'Fog', icon: '🌫️' },
-  48: { label: 'Icy Fog', icon: '🌫️' },
-  51: { label: 'Drizzle', icon: '🌦️' },
-  53: { label: 'Drizzle', icon: '🌦️' },
-  55: { label: 'Heavy Drizzle', icon: '🌧️' },
-  61: { label: 'Rain', icon: '🌧️' },
-  63: { label: 'Rain', icon: '🌧️' },
-  65: { label: 'Heavy Rain', icon: '🌧️' },
-  71: { label: 'Snow', icon: '❄️' },
-  73: { label: 'Snow', icon: '❄️' },
-  75: { label: 'Heavy Snow', icon: '❄️' },
-  77: { label: 'Snowflakes', icon: '🌨️' },
-  80: { label: 'Showers', icon: '🌦️' },
-  81: { label: 'Showers', icon: '🌦️' },
-  82: { label: 'Heavy Showers', icon: '⛈️' },
-  85: { label: 'Snow Showers', icon: '🌨️' },
-  86: { label: 'Heavy Snow', icon: '🌨️' },
-  95: { label: 'Thunderstorm', icon: '⛈️' },
-  96: { label: 'Thunderstorm', icon: '⛈️' },
-  99: { label: 'Thunderstorm', icon: '⛈️' },
+  0: { label: 'Skýlaust', icon: '☀️' },
+  1: { label: 'Mest skýlaust', icon: '🌤️' },
+  2: { label: 'Hlutskýjað', icon: '⛅' },
+  3: { label: 'Þungaskýjað', icon: '☁️' },
+  45: { label: 'Þoka', icon: '🌫️' },
+  48: { label: 'Þoka', icon: '🌫️' },
+  51: { label: 'Súlur', icon: '🌦️' },
+  53: { label: 'Súlur', icon: '🌦️' },
+  55: { label: 'Þungar súlur', icon: '🌧️' },
+  61: { label: 'Rigning', icon: '🌧️' },
+  63: { label: 'Rigning', icon: '🌧️' },
+  65: { label: 'Þung rigning', icon: '🌧️' },
+  71: { label: 'Snjókoma', icon: '❄️' },
+  73: { label: 'Snjókoma', icon: '❄️' },
+  75: { label: 'Þung snjókoma', icon: '❄️' },
+  77: { label: 'Snjóél', icon: '🌨️' },
+  80: { label: 'Skúrir', icon: '🌦️' },
+  81: { label: 'Skúrir', icon: '🌦️' },
+  82: { label: 'Þungar skúrir', icon: '⛈️' },
+  85: { label: 'Snjóskúrir', icon: '🌨️' },
+  86: { label: 'Þungar snjóskúrir', icon: '🌨️' },
+  95: { label: 'Él', icon: '⛈️' },
+  96: { label: 'Él', icon: '⛈️' },
+  99: { label: 'Þungt él', icon: '⛈️' },
 }
 
 export function useWeather(lat = 64.1355, lon = -21.8954) {
@@ -44,7 +44,7 @@ export function useWeather(lat = 64.1355, lon = -21.8954) {
     fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m` +
-      `&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+      `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
       `&timezone=Atlantic%2FReykjavik&forecast_days=5`
     )
       .then(r => r.json())
@@ -55,7 +55,7 @@ export function useWeather(lat = 64.1355, lon = -21.8954) {
           code: d.current.weathercode,
           wind: Math.round(d.current.windspeed_10m),
           humidity: d.current.relativehumidity_2m,
-          ...WEATHER_CODES[d.current.weathercode] || { label: 'Unknown', icon: '🌡️' },
+          ...(WEATHER_CODES[d.current.weathercode] || { label: 'Óþekkt', icon: '🌡️' }),
           daily: d.daily.time.slice(0, 5).map((t, i) => ({
             date: t,
             code: d.daily.weathercode[i],
