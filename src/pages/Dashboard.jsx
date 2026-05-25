@@ -5,10 +5,20 @@ import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
-import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
+
+const MOTIVATIONS = [
+  'Lendó er að vaxa 🚀',
+  'Nýr dagur, ný tækifæri',
+  'Létt í skauti, létt í huganum',
+  'Addi í sessi',
+  'Þetta er þinn dagur',
+  'Vertu bestinn útgáfa þín',
+]
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
+  const motivation = MOTIVATIONS[new Date().getDay() % MOTIVATIONS.length]
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 30000)
@@ -25,13 +35,14 @@ export default function Dashboard() {
             {formatTime(time)} · {formatDate(time)}
           </span>
         </div>
+        <div className="text-xs mt-1" style={{ color: 'var(--accent)', opacity: 0.8 }}>{motivation}</div>
       </div>
 
       {/* Weather */}
       <WeatherWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* Lendó income */}
+      <LendoWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">

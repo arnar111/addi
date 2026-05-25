@@ -1,5 +1,6 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Timer, FolderOpen, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +8,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_income', 'addi_income_goal']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -16,6 +17,29 @@ export default function Settings() {
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="px-1 pt-2">
         <h1 className="text-xl font-semibold">Stillingar</h1>
+      </div>
+
+      {/* Mobile-only nav links to pages not in bottom nav */}
+      <div className="card flex flex-col gap-1 md:hidden">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="font-semibold text-sm">Fleiri síður</span>
+        </div>
+        <Link to="/timer" className="flex items-center justify-between py-2.5 px-1 rounded-xl transition-all hover:bg-[var(--surface2)]"
+              style={{ textDecoration: 'none', color: 'var(--text)' }}>
+          <div className="flex items-center gap-3">
+            <Timer size={18} style={{ color: 'var(--muted)' }} />
+            <span className="text-sm">Tímari</span>
+          </div>
+          <ChevronRight size={16} style={{ color: 'var(--muted)' }} />
+        </Link>
+        <Link to="/projects" className="flex items-center justify-between py-2.5 px-1 rounded-xl transition-all hover:bg-[var(--surface2)]"
+              style={{ textDecoration: 'none', color: 'var(--text)' }}>
+          <div className="flex items-center gap-3">
+            <FolderOpen size={18} style={{ color: 'var(--muted)' }} />
+            <span className="text-sm">Verkefni &amp; Tenglar</span>
+          </div>
+          <ChevronRight size={16} style={{ color: 'var(--muted)' }} />
+        </Link>
       </div>
 
       {/* Profile */}
@@ -45,7 +69,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
