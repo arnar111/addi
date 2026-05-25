@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNotes } from '../../hooks/useNotes'
-import { StickyNote, Plus, Pin } from 'lucide-react'
+import { Plus, Pin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function QuickNoteWidget() {

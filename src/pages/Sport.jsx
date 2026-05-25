@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useWCCountdown, useLiveScores } from '../hooks/useSport'
-import { ExternalLink, Tv, Trophy, Activity } from 'lucide-react'
+import { ExternalLink, Tv } from 'lucide-react'
 
 const LEAGUES = [
   { id: 'fifa.world', label: 'WC 2026', icon: '🌍' },

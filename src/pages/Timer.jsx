@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Play, Pause, RotateCcw, Settings2 } from 'lucide-react'
+import { Play, Pause, RotateCcw } from 'lucide-react'
 
 const MODES = [
   { id: 'pomodoro', label: 'Pomodoro', minutes: 25, color: 'var(--accent)' },
@@ -16,7 +16,6 @@ export default function Timer() {
   const [seconds, setSeconds] = useState(25 * 60)
   const [running, setRunning] = useState(false)
   const [sessions, setSessions] = useState(0)
-  const [showCustom, setShowCustom] = useState(false)
   const intervalRef = useRef(null)
 
   const mode = MODES.find(m => m.id === modeId) || MODES[0]
@@ -32,7 +31,7 @@ export default function Timer() {
           if (s <= 1) {
             setRunning(false)
             if (modeId === 'pomodoro') setSessions(n => n + 1)
-            try { new Audio('https://www.soundjay.com/misc/bell-ringing-01.mp3').play() } catch {}
+            try { new Audio('https://www.soundjay.com/misc/bell-ringing-01.mp3').play() } catch { /* bell unavailable */ }
             return 0
           }
           return s - 1

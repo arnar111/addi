@@ -36,8 +36,10 @@ export function useWeather(lat = 64.1355, lon = -21.8954) {
     const cached = sessionStorage.getItem('weather')
     const cachedAt = sessionStorage.getItem('weatherAt')
     if (cached && cachedAt && Date.now() - Number(cachedAt) < 10 * 60 * 1000) {
-      setData(JSON.parse(cached))
-      setLoading(false)
+      Promise.resolve().then(() => {
+        setData(JSON.parse(cached))
+        setLoading(false)
+      })
       return
     }
 

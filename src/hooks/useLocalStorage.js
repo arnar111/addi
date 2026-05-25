@@ -13,7 +13,7 @@ export function useLocalStorage(key, initialValue) {
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value))
-    } catch {}
+    } catch { /* quota exceeded or private mode */ }
   }, [key, value])
 
   return [value, setValue]

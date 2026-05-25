@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useFinance } from '../hooks/useFinance'
 import { useSubscriptions } from '../hooks/useSubscriptions'

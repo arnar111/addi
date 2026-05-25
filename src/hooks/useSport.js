@@ -24,24 +24,30 @@ export function useWCCountdown() {
   return countdown
 }
 
+function getCache(league) {
+  try {
+    const at = sessionStorage.getItem(`sport_${league}_at`)
+    const data = sessionStorage.getItem(`sport_${league}`)
+    if (data && at && Date.now() - Number(at) < 3 * 60 * 1000) return JSON.parse(data)
+  } catch { /* ignore */ }
+  return null
+}
+
 export function useLiveScores(league) {
-  const [matches, setMatches] = useState([])
-  const [loading, setLoading] = useState(true)
+  const cached = league ? getCache(league) : null
+  const [matches, setMatches] = useState(cached || [])
+  const [loading, setLoading] = useState(!cached && Boolean(league))
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!league) { setLoading(false); return }
-    const cacheKey = `sport_${league}`
-    const cachedAt = sessionStorage.getItem(`${cacheKey}_at`)
-    const cached = sessionStorage.getItem(cacheKey)
-    if (cached && cachedAt && Date.now() - Number(cachedAt) < 3 * 60 * 1000) {
-      setMatches(JSON.parse(cached))
-      setLoading(false)
-      return
-    }
+    if (!league) return
+    if (getCache(league)) return
+
+    let cancelled = false
     fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard`)
       .then(r => r.json())
       .then(d => {
+        if (cancelled) return
         const events = (d.events || []).slice(0, 10).map(e => {
           const comps = e.competitions?.[0]
           const home = comps?.competitors?.find(c => c.homeAway === 'home')
@@ -50,8 +56,6 @@ export function useLiveScores(league) {
             id: e.id,
             home: home?.team?.shortDisplayName || home?.team?.name || '?',
             away: away?.team?.shortDisplayName || away?.team?.name || '?',
-            homeLogo: home?.team?.logo,
-            awayLogo: away?.team?.logo,
             homeScore: home?.score ?? '-',
             awayScore: away?.score ?? '-',
             status: e.status?.type?.shortDetail || '',
@@ -60,12 +64,18 @@ export function useLiveScores(league) {
             date: e.date,
           }
         })
-        sessionStorage.setItem(cacheKey, JSON.stringify(events))
-        sessionStorage.setItem(`${cacheKey}_at`, String(Date.now()))
+        try {
+          sessionStorage.setItem(`sport_${league}`, JSON.stringify(events))
+          sessionStorage.setItem(`sport_${league}_at`, String(Date.now()))
+        } catch { /* ignore */ }
         setMatches(events)
         setLoading(false)
       })
-      .catch(err => { setError(err.message); setLoading(false) })
+      .catch(err => {
+        if (!cancelled) { setError(err.message); setLoading(false) }
+      })
+
+    return () => { cancelled = true }
   }, [league])
 
   return { matches, loading, error }

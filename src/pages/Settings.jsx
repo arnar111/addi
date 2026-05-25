@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
