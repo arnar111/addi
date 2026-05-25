@@ -1,7 +1,131 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, Calendar } from 'lucide-react'
+
+const DEFAULT_SUBS = [
+  { id: 's1', name: 'Apple iCloud+', amount: 1499, icon: '🍎', billing: 'monthly', due: 23 },
+  { id: 's2', name: 'Huel', amount: 9900, icon: '🥤', billing: 'monthly', due: 15 },
+  { id: 's3', name: 'The Athletic', amount: 2490, icon: '⚽', billing: 'monthly', due: 1 },
+  { id: 's4', name: 'Patreon', amount: 1500, icon: '🎬', billing: 'monthly', due: 10 },
+  { id: 's5', name: 'Nicco', amount: 3500, icon: '📦', billing: 'monthly', due: 20 },
+  { id: 's6', name: 'Netlify', amount: 3200, icon: '🌐', billing: 'monthly', due: 24 },
+]
+
+function SubscriptionsTab() {
+  const [subs, setSubs] = useLocalStorage('addi_subscriptions', DEFAULT_SUBS)
+  const [showAdd, setShowAdd] = useState(false)
+  const [name, setName] = useState('')
+  const [amount, setAmount] = useState('')
+  const [icon, setIcon] = useState('📱')
+  const [due, setDue] = useState('')
+
+  const total = subs.reduce((s, sub) => s + sub.amount, 0)
+  const today = new Date().getDate()
+
+  const handleAdd = (e) => {
+    e.preventDefault()
+    if (!name || !amount) return
+    setSubs(prev => [...prev, {
+      id: Date.now().toString(),
+      name, amount: Number(amount), icon,
+      billing: 'monthly', due: Number(due) || 1,
+    }])
+    setName(''); setAmount(''); setDue(''); setShowAdd(false)
+  }
+
+  const upcomingDays = 7
+  const upcoming = subs.filter(s => {
+    const daysUntil = s.due >= today ? s.due - today : (31 - today) + s.due
+    return daysUntil <= upcomingDays
+  })
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(0,212,170,0.06))' }}>
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Mánaðarlegar áskriftir</div>
+            <div className="text-2xl font-semibold">{formatISK(total)}</div>
+          </div>
+          <div className="text-3xl">📱</div>
+        </div>
+      </div>
+
+      {upcoming.length > 0 && (
+        <div className="card" style={{ borderColor: 'rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.05)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar size={14} style={{ color: '#f97316' }} />
+            <span className="text-xs font-semibold" style={{ color: '#f97316' }}>Koma á næstu {upcomingDays} dögum</span>
+          </div>
+          {upcoming.map(s => (
+            <div key={s.id} className="flex items-center justify-between py-1.5"
+                 style={{ borderBottom: '1px solid var(--border)' }}>
+              <div className="flex items-center gap-2 text-sm">
+                <span>{s.icon}</span>
+                <span>{s.name}</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs">
+                <span style={{ color: 'var(--muted)' }}>
+                  {s.due >= today ? `${s.due - today}d` : 'á morgun'}
+                </span>
+                <span className="font-semibold">{formatShortISK(s.amount)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold px-1">Allar áskriftir</h3>
+        <button onClick={() => setShowAdd(!showAdd)} className="btn btn-primary" style={{ padding: '6px 12px', fontSize: 12 }}>
+          <Plus size={13} /> Bæta við
+        </button>
+      </div>
+
+      {showAdd && (
+        <form onSubmit={handleAdd} className="card flex flex-col gap-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Ný áskrift</h3>
+            <button type="button" onClick={() => setShowAdd(false)}><X size={16} style={{ color: 'var(--muted)' }} /></button>
+          </div>
+          <div className="flex gap-2">
+            <input className="input" style={{ width: 48 }} value={icon} onChange={e => setIcon(e.target.value)} placeholder="📱" />
+            <input className="input flex-1" placeholder="Heiti (t.d. Netflix)" value={name} onChange={e => setName(e.target.value)} autoFocus />
+          </div>
+          <div className="flex gap-2">
+            <input className="input flex-1" type="number" placeholder="Upphæð (ISK)" value={amount} onChange={e => setAmount(e.target.value)} />
+            <input className="input w-20" type="number" placeholder="Dagur" min="1" max="31" value={due} onChange={e => setDue(e.target.value)} />
+          </div>
+          <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+        </form>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {subs.map(sub => (
+          <div key={sub.id} className="card flex items-center gap-3 py-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                 style={{ background: 'var(--surface2)' }}>{sub.icon}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold">{sub.name}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                Mánaðarlega · gjalddagi {sub.due}.
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold">{formatShortISK(sub.amount)}</span>
+              <button onClick={() => setSubs(prev => prev.filter(s => s.id !== sub.id))}
+                      style={{ color: 'var(--muted)' }}>
+                <Trash2 size={13} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -112,15 +236,16 @@ export default function Finance() {
         </form>
       )}
 
-      {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subscriptions', 'Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
               background: tab === t ? 'rgba(0,212,170,0.12)' : 'var(--surface)',
               color: tab === t ? 'var(--accent)' : 'var(--muted)',
               border: `1px solid ${tab === t ? 'rgba(0,212,170,0.25)' : 'var(--border)'}`,
+              padding: '8px 6px',
+              fontSize: 13,
             }}>{l}</button>
         ))}
       </div>
@@ -183,6 +308,8 @@ export default function Finance() {
           })}
         </div>
       )}
+
+      {tab === 'subscriptions' && <SubscriptionsTab />}
     </div>
   )
 }
