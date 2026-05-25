@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, ShoppingCart, Sparkles } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, Trophy, Sparkles } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
+  { to: '/sports', icon: Trophy, label: 'Íþróttir' },
   { to: '/habits', icon: Sparkles, label: 'Venjur' },
 ]
 

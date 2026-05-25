@@ -15,14 +15,14 @@ import { ShoppingCart, ArrowRight } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 const QUICK_LINKS = [
+  { name: 'Wolt', url: 'https://wolt.com/is/isl/reykjavik', icon: '🍕' },
   { name: 'The Athletic', url: 'https://theathletic.com', icon: '📰' },
-  { name: 'Alfred.is', url: 'https://alfred.is', icon: '💼' },
-  { name: 'r/ClaudeAI', url: 'https://reddit.com/r/ClaudeAI', icon: '🤖' },
-  { name: 'Kringlan', url: 'https://kringlan.is', icon: '🛍️' },
-  { name: 'Netlify', url: 'https://app.netlify.com', icon: '🚀' },
+  { name: 'Inter Milan', url: 'https://theathletic.com/tag/inter-milan/', icon: '⚫🔵' },
   { name: 'GitHub', url: 'https://github.com/arnar111', icon: '🐙' },
-  { name: 'Coursera', url: 'https://coursera.org', icon: '🎓' },
-  { name: 'BBC Sport', url: 'https://bbc.com/sport/football', icon: '⚽' },
+  { name: 'Netlify', url: 'https://app.netlify.com', icon: '🚀' },
+  { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' },
+  { name: 'Alfred.is', url: 'https://alfred.is', icon: '🏦' },
+  { name: 'Kringlan', url: 'https://kringlan.is', icon: '🛍️' },
 ]
 
 function ShoppingSnapshotWidget() {
@@ -51,7 +51,7 @@ function ShoppingSnapshotWidget() {
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
-  const [name] = useLocalStorage('addi_name', 'Arnar')
+  const [name] = useLocalStorage('addi_name', 'Addi')
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 30000)

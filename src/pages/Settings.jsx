@@ -6,7 +6,7 @@ import { User, MapPin, Trash2, Info, Timer, Download, Upload, ShoppingCart, Trop
 const DATA_KEYS = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_income', 'addi_notes', 'addi_budget', 'addi_shopping', 'addi_subs', 'addi_subscriptions', 'addi_name', 'addi_city']
 
 export default function Settings() {
-  const [name, setName] = useLocalStorage('addi_name', 'Arnar')
+  const [name, setName] = useLocalStorage('addi_name', 'Addi')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
   const importRef = useRef()
 

@@ -52,8 +52,9 @@ function parseMatch(event, leagueName) {
 }
 
 const LEAGUES = [
-  { path: 'sports/soccer/eng.1/scoreboard', name: 'Premier League' },
+  { path: 'sports/soccer/ita.1/scoreboard', name: 'Serie A' },
   { path: 'sports/soccer/UEFA.Champions_League/scoreboard', name: 'Champions League' },
+  { path: 'sports/soccer/eng.1/scoreboard', name: 'Premier League' },
   { path: 'sports/soccer/UEFA.Europa_League/scoreboard', name: 'Europa League' },
 ]
 

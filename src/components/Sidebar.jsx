@@ -9,7 +9,8 @@ const NAV = [
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
   { to: '/shopping', icon: ShoppingCart, label: 'Innkaup' },
   { to: '/habits', icon: Sparkles, label: 'Venjur' },
-  { to: '/football', icon: Trophy, label: 'Fótbolti' },
+  { to: '/sports', icon: Trophy, label: 'Íþróttir' },
+  { to: '/football', icon: Trophy, label: 'HM 2026' },
   { to: '/subs', icon: CreditCard, label: 'Áskriftir' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
@@ -18,7 +19,7 @@ const NAV = [
 
 export default function Sidebar() {
   const { failing } = useSubscriptions()
-  const [name] = useLocalStorage('addi_name', 'Arnar')
+  const [name] = useLocalStorage('addi_name', 'Addi')
   const [city] = useLocalStorage('addi_city', 'Reykjavík')
 
   return (

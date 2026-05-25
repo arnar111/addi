@@ -11,6 +11,7 @@ import Subscriptions from './pages/Subscriptions'
 import Football from './pages/Football'
 import Shopping from './pages/Shopping'
 import Habits from './pages/Habits'
+import Sports from './pages/Sports'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/subs" element={<Subscriptions />} />
             <Route path="/football" element={<Football />} />
+            <Route path="/sports" element={<Sports />} />
             <Route path="/shopping" element={<Shopping />} />
             <Route path="/habits" element={<Habits />} />
           </Routes>
