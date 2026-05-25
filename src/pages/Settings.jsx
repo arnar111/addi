@@ -1,13 +1,16 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { useFinance } from '../hooks/useFinance'
+import { formatISK } from '../utils/currency'
+import { User, MapPin, Trash2, Info, Target } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const { incomeGoal, setIncomeGoal, budget, setBudget } = useFinance()
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_incomes', 'addi_notes', 'addi_budget', 'addi_income_goal']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -37,6 +40,36 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Financial goals */}
+      <div className="card flex flex-col gap-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Target size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Fjármálamarkmið</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
+            🏠 Mánaðarlegt Lendo/tekjumark (ISK)
+          </label>
+          <input className="input text-sm" type="number"
+                 value={incomeGoal}
+                 onChange={e => setIncomeGoal(Number(e.target.value))} />
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Núverandi mark: {formatISK(incomeGoal)}/mánuður
+          </p>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
+            💸 Mánaðarleg útgjaldaáætlun (ISK)
+          </label>
+          <input className="input text-sm" type="number"
+                 value={budget.monthly}
+                 onChange={e => setBudget(b => ({ ...b, monthly: Number(e.target.value) }))} />
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
+            Núverandi áætlun: {formatISK(budget.monthly)}/mánuður
+          </p>
+        </div>
+      </div>
+
       {/* App info */}
       <div className="card flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-1">
@@ -45,7 +78,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],

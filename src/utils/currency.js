@@ -22,3 +22,12 @@ export const EXPENSE_CATEGORIES = [
   { id: 'subscriptions', label: 'Áskriftir', icon: '📱', color: '#00d4aa' },
   { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
 ]
+
+export const INCOME_CATEGORIES = [
+  { id: 'lendo', label: 'Lendo', icon: '🏠', color: '#00d4aa' },
+  { id: 'salary', label: 'Laun', icon: '💼', color: '#8b5cf6' },
+  { id: 'bonus', label: 'Bónus', icon: '⭐', color: '#f97316' },
+  { id: 'freelance', label: 'Verkefni', icon: '🚀', color: '#3b82f6' },
+  { id: 'investment', label: 'Fjárfesting', icon: '📈', color: '#22c55e' },
+  { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
+]
