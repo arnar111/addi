@@ -1,14 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
-import { Play, Pause, RotateCcw, Settings2 } from 'lucide-react'
+import { Play, Pause, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react'
 
 const MODES = [
-  { id: 'pomodoro', label: 'Pomodoro', minutes: 25, color: 'var(--accent)' },
-  { id: 'short', label: 'Stutt hlé', minutes: 5, color: '#8b5cf6' },
-  { id: 'long', label: 'Langt hlé', minutes: 15, color: '#3b82f6' },
-  { id: 'custom', label: 'Sérsniðið', minutes: 30, color: '#f97316' },
+  { id: 'pomodoro', label: 'Pomodoro', minutes: 25, color: 'var(--accent)', icon: '🍅' },
+  { id: 'short', label: 'Stutt hlé', minutes: 5, color: '#8b5cf6', icon: '☕' },
+  { id: 'long', label: 'Langt hlé', minutes: 15, color: '#3b82f6', icon: '🧘' },
+  { id: 'raeda', label: 'Ræða', minutes: 3, color: '#f97316', icon: '🎤' },
+  { id: 'svor', label: 'Svör', minutes: 1, color: '#ec4899', icon: '💬' },
+  { id: 'custom', label: 'Sérsniðið', minutes: 30, color: '#64748b', icon: '⚙️' },
 ]
 
-function pad(n) { return String(n).padStart(2, '0') }
+const DEBATE_PRESETS = [
+  { label: 'Meðmælandi ræða', duration: 3, icon: '🎤', note: 'Aðalræða' },
+  { label: 'Andmælandi ræða', duration: 3, icon: '🎙️', note: 'Aðalræða' },
+  { label: 'Svör', duration: 1.5, icon: '💬', note: 'Viðbrögð' },
+  { label: 'Málflutningur', duration: 3, icon: '⚖️', note: 'Lokaræða' },
+]
+
+function pad(n) { return String(Math.floor(n)).padStart(2, '0') }
 
 export default function Timer() {
   const [modeId, setModeId] = useState('pomodoro')
@@ -16,7 +25,7 @@ export default function Timer() {
   const [seconds, setSeconds] = useState(25 * 60)
   const [running, setRunning] = useState(false)
   const [sessions, setSessions] = useState(0)
-  const [showCustom, setShowCustom] = useState(false)
+  const [showDebate, setShowDebate] = useState(false)
   const intervalRef = useRef(null)
 
   const mode = MODES.find(m => m.id === modeId) || MODES[0]
@@ -32,7 +41,18 @@ export default function Timer() {
           if (s <= 1) {
             setRunning(false)
             if (modeId === 'pomodoro') setSessions(n => n + 1)
-            try { new Audio('https://www.soundjay.com/misc/bell-ringing-01.mp3').play() } catch {}
+            try {
+              const ctx = new AudioContext()
+              const o = ctx.createOscillator()
+              const g = ctx.createGain()
+              o.connect(g)
+              g.connect(ctx.destination)
+              o.frequency.setValueAtTime(880, ctx.currentTime)
+              g.gain.setValueAtTime(0.3, ctx.currentTime)
+              g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1)
+              o.start()
+              o.stop(ctx.currentTime + 1)
+            } catch {}
             return 0
           }
           return s - 1
@@ -44,16 +64,18 @@ export default function Timer() {
     return () => clearInterval(intervalRef.current)
   }, [running, modeId])
 
-  const selectMode = (id) => {
+  const selectMode = (id, customMinutes) => {
     setRunning(false)
     setModeId(id)
     const m = MODES.find(m => m.id === id)
-    setSeconds(id === 'custom' ? customMins * 60 : m.minutes * 60)
+    const dur = id === 'custom' ? (customMinutes ?? customMins) : m.minutes
+    setSeconds(Math.round(dur * 60))
   }
 
   const reset = () => {
     setRunning(false)
-    setSeconds(modeId === 'custom' ? customMins * 60 : mode.minutes * 60)
+    const dur = modeId === 'custom' ? customMins : mode.minutes
+    setSeconds(Math.round(dur * 60))
   }
 
   const r = 80
@@ -64,7 +86,7 @@ export default function Timer() {
     <div className="flex flex-col gap-6 pb-4 animate-slide-up">
       <div className="px-1 pt-2">
         <h1 className="text-xl font-semibold">Tímari</h1>
-        <p className="text-sm" style={{ color: 'var(--muted)' }}>{sessions} Pomodoro lokins í dag</p>
+        <p className="text-sm" style={{ color: 'var(--muted)' }}>{sessions} Pomodoro lokin í dag</p>
       </div>
 
       {/* Mode selector */}
@@ -76,7 +98,9 @@ export default function Timer() {
               background: modeId === m.id ? `${m.color}22` : 'var(--surface)',
               color: modeId === m.id ? m.color : 'var(--muted)',
               border: `1px solid ${modeId === m.id ? m.color + '44' : 'var(--border)'}`,
-            }}>{m.label}</button>
+            }}>
+            {m.icon} {m.label}
+          </button>
         ))}
       </div>
 
@@ -84,7 +108,7 @@ export default function Timer() {
         <div className="card flex items-center gap-3">
           <label className="text-sm shrink-0" style={{ color: 'var(--muted)' }}>Mínútur:</label>
           <input className="input text-sm" type="number" min={1} max={120} value={customMins}
-            onChange={e => { setCustomMins(Number(e.target.value)); setSeconds(Number(e.target.value) * 60); setRunning(false) }} />
+            onChange={e => { const v = Number(e.target.value); setCustomMins(v); setSeconds(v * 60); setRunning(false) }} />
         </div>
       )}
 
@@ -101,6 +125,7 @@ export default function Timer() {
               style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="text-xl mb-1">{mode.icon}</div>
             <div className="text-4xl font-mono font-bold tabular-nums">
               {pad(mins)}:{pad(secs)}
             </div>
@@ -114,17 +139,46 @@ export default function Timer() {
           </button>
           <button onClick={() => setRunning(!running)}
             className="btn btn-primary"
-            style={{ padding: '12px 32px', background: mode.color, fontSize: 16, color: mode.id === 'short' ? '#fff' : '#000' }}>
+            style={{ padding: '12px 32px', background: mode.color, fontSize: 16, color: '#fff' }}>
             {running ? <Pause size={20} /> : <Play size={20} />}
             {running ? 'Hlé' : 'Hefja'}
           </button>
         </div>
       </div>
 
+      {/* Debate mode */}
+      <div className="card">
+        <button className="flex items-center justify-between w-full"
+                onClick={() => setShowDebate(!showDebate)}>
+          <span className="font-semibold text-sm">⚖️ Ræðukeppni stillingar</span>
+          {showDebate ? <ChevronUp size={16} style={{ color: 'var(--muted)' }} /> : <ChevronDown size={16} style={{ color: 'var(--muted)' }} />}
+        </button>
+        {showDebate && (
+          <div className="flex flex-col gap-2 mt-3">
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>Smelltu til að stilla tímara fyrir hvern hluta keppninnar</p>
+            <div className="grid grid-cols-2 gap-2">
+              {DEBATE_PRESETS.map(p => (
+                <button key={p.label}
+                  onClick={() => selectMode('custom', p.duration)}
+                  className="flex flex-col items-start gap-1 p-3 rounded-xl transition-all"
+                  style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                  <div className="flex items-center gap-1.5">
+                    <span>{p.icon}</span>
+                    <span className="text-xs font-semibold">{p.label}</span>
+                  </div>
+                  <span className="text-xs" style={{ color: 'var(--accent)' }}>{p.duration} mín</span>
+                  <span className="text-xs" style={{ color: 'var(--muted)' }}>{p.note}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Session dots */}
       {sessions > 0 && (
         <div className="card flex flex-col items-center gap-3">
-          <div className="text-sm font-medium">Í dag</div>
+          <div className="text-sm font-medium">Pomodoro í dag</div>
           <div className="flex flex-wrap gap-2 justify-center">
             {Array.from({ length: sessions }).map((_, i) => (
               <div key={i} className="w-3 h-3 rounded-full" style={{ background: 'var(--accent)' }} />

@@ -20,7 +20,7 @@ export default function WeatherWidget() {
     <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.08), rgba(139,92,246,0.08))', border: '1px solid var(--border)' }}>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Reykjavík</div>
+          <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Garðabær</div>
           <div className="flex items-end gap-2">
             <span className="text-5xl font-light">{data.temp}°</span>
             <span className="text-2xl mb-1">{data.icon}</span>
