@@ -2,6 +2,7 @@ import { useLocalStorage } from './useLocalStorage'
 
 export function useFinance() {
   const [expenses, setExpenses] = useLocalStorage('addi_expenses', [])
+  const [income, setIncome] = useLocalStorage('addi_income', [])
   const [budget, setBudget] = useLocalStorage('addi_budget', {
     monthly: 400000,
     categories: {
@@ -30,6 +31,20 @@ export function useFinance() {
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 
+  const addIncome = (amount, source, note = '', date = null) => {
+    setIncome(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source: source || 'other',
+      note,
+      date: date || new Date().toISOString(),
+    }, ...prev])
+  }
+
+  const removeIncome = (id) => {
+    setIncome(prev => prev.filter(i => i.id !== id))
+  }
+
   const currentMonth = () => {
     const now = new Date()
     return expenses.filter(e => {
@@ -38,7 +53,17 @@ export function useFinance() {
     })
   }
 
+  const currentMonthIncome = () => {
+    const now = new Date()
+    return income.filter(i => {
+      const d = new Date(i.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
+  const monthlyIncomeTotal = () => currentMonthIncome().reduce((s, i) => s + i.amount, 0)
+  const netBalance = () => monthlyIncomeTotal() - monthlyTotal()
 
   const byCategory = () => {
     const m = currentMonth()
@@ -52,11 +77,15 @@ export function useFinance() {
   const remaining = () => budget.monthly - monthlyTotal()
 
   const recentExpenses = expenses.slice(0, 20)
+  const recentIncome = income.slice(0, 20)
 
   return {
     expenses, addExpense, removeExpense,
+    income, addIncome, removeIncome,
     budget, setBudget,
-    currentMonth, monthlyTotal, byCategory, remaining,
-    recentExpenses,
+    currentMonth, currentMonthIncome,
+    monthlyTotal, monthlyIncomeTotal, netBalance,
+    byCategory, remaining,
+    recentExpenses, recentIncome,
   }
 }

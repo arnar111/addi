@@ -1,14 +1,21 @@
 {
-  "name": "Addi",
+  "name": "Addi — Dagleg stýrikerfi",
   "short_name": "Addi",
-  "description": "Your personal daily OS",
+  "description": "Addi's personal daily OS — finances, habits, football & more",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0e1a",
   "theme_color": "#0a0e1a",
   "orientation": "portrait-primary",
+  "lang": "is",
+  "categories": ["productivity", "lifestyle", "finance"],
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mælaborð", "url": "/", "description": "Opna mælaborð" },
+    { "name": "Fjármál", "url": "/finance", "description": "Skoða fjármál" },
+    { "name": "Verkefni", "url": "/tasks", "description": "Verkefnalisti" }
   ]
 }
