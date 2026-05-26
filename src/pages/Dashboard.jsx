@@ -6,6 +6,7 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -29,6 +30,9 @@ export default function Dashboard() {
 
       {/* Weather */}
       <WeatherWidget />
+
+      {/* Lendo business snapshot */}
+      <LendoWidget />
 
       {/* Spotify */}
       <SpotifyWidget />
