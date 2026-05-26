@@ -4,10 +4,12 @@ const todayStr = () => new Date().toISOString().split('T')[0]
 
 export function useHabits() {
   const [habits, setHabits] = useLocalStorage('addi_habits', [
-    { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
+    { id: '1', name: 'Huel', icon: '💪', color: '#f97316', completions: [] },
+    { id: '2', name: 'Duolingo', icon: '🦜', color: '#58cc02', completions: [] },
+    { id: '3', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
+    { id: '4', name: 'Hlusta á bók', icon: '🎧', color: '#8b5cf6', completions: [] },
+    { id: '5', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
+    { id: '6', name: 'Fara snemma að sofa', icon: '😴', color: '#6366f1', completions: [] },
   ])
 
   const toggle = (id) => {
