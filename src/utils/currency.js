@@ -20,5 +20,6 @@ export const EXPENSE_CATEGORIES = [
   { id: 'health', label: 'Heilsa', icon: '💊', color: '#22c55e' },
   { id: 'shopping', label: 'Innkaup', icon: '🛍️', color: '#eab308' },
   { id: 'subscriptions', label: 'Áskriftir', icon: '📱', color: '#00d4aa' },
+  { id: 'sport', label: 'Sport', icon: '⚽', color: '#10b981' },
   { id: 'other', label: 'Annað', icon: '💰', color: '#64748b' },
 ]
