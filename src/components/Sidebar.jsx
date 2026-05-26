@@ -42,7 +42,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Garðabær
       </div>
     </aside>
   )

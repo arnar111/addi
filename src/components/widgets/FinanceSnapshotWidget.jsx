@@ -1,14 +1,16 @@
 import { useFinance } from '../../hooks/useFinance'
+import { useIncome } from '../../hooks/useIncome'
 import { formatShortISK } from '../../utils/currency'
 import { Link } from 'react-router-dom'
-import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronRight, ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 
 export default function FinanceSnapshotWidget() {
-  const { monthlyTotal, remaining, budget } = useFinance()
-  const total = monthlyTotal()
-  const left = remaining()
-  const pct = Math.min(100, Math.round((total / budget.monthly) * 100))
-  const isOver = left < 0
+  const { monthlyTotal, budget } = useFinance()
+  const { monthlyTotal: incomeTotal } = useIncome()
+  const spent = monthlyTotal()
+  const income = incomeTotal()
+  const net = income - spent
+  const pct = Math.min(100, Math.round((spent / budget.monthly) * 100))
 
   return (
     <div className="card">
@@ -19,17 +21,25 @@ export default function FinanceSnapshotWidget() {
         </Link>
       </div>
 
-      <div className="flex justify-between items-end mb-3">
-        <div>
-          <div className="text-2xl font-semibold">{formatShortISK(total)}</div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-            af {formatShortISK(budget.monthly)} fjárhagsáætlun
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className="flex flex-col gap-0.5 p-2.5 rounded-xl" style={{ background: 'rgba(34,197,94,0.08)' }}>
+          <div className="text-xs flex items-center gap-0.5" style={{ color: 'var(--muted)' }}>
+            <ArrowDownLeft size={10} style={{ color: '#22c55e' }} /> Tekjur
           </div>
+          <div className="text-sm font-semibold" style={{ color: '#22c55e' }}>{formatShortISK(income)}</div>
         </div>
-        <div className={`flex items-center gap-1 text-sm font-medium`}
-             style={{ color: isOver ? 'var(--danger)' : 'var(--success)' }}>
-          {isOver ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
-          {formatShortISK(Math.abs(left))} {isOver ? 'yfir' : 'eftir'}
+        <div className="flex flex-col gap-0.5 p-2.5 rounded-xl" style={{ background: 'rgba(239,68,68,0.08)' }}>
+          <div className="text-xs flex items-center gap-0.5" style={{ color: 'var(--muted)' }}>
+            <ArrowUpRight size={10} style={{ color: '#ef4444' }} /> Gjöld
+          </div>
+          <div className="text-sm font-semibold" style={{ color: '#ef4444' }}>{formatShortISK(spent)}</div>
+        </div>
+        <div className="flex flex-col gap-0.5 p-2.5 rounded-xl"
+             style={{ background: net >= 0 ? 'rgba(0,212,170,0.08)' : 'rgba(239,68,68,0.08)' }}>
+          <div className="text-xs" style={{ color: 'var(--muted)' }}>Nettó</div>
+          <div className="text-sm font-semibold" style={{ color: net >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
+            {net >= 0 ? '+' : ''}{formatShortISK(net)}
+          </div>
         </div>
       </div>
 
@@ -37,10 +47,13 @@ export default function FinanceSnapshotWidget() {
         <div className="h-full rounded-full transition-all duration-500"
              style={{
                width: `${pct}%`,
-               background: isOver ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)',
+               background: pct > 100 ? 'var(--danger)' : pct > 80 ? '#f97316' : 'var(--accent)',
              }} />
       </div>
-      <div className="text-xs mt-1 text-right" style={{ color: 'var(--muted)' }}>{pct}% notað</div>
+      <div className="text-xs mt-1 flex justify-between" style={{ color: 'var(--muted)' }}>
+        <span>{pct}% af fjárhagsáætlun</span>
+        <span>{formatShortISK(budget.monthly)}</span>
+      </div>
     </div>
   )
 }
