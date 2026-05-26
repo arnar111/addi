@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useLendo } from '../hooks/useLendo'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
 import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
 
@@ -26,6 +27,7 @@ function CategoryBar({ cat, spent, budget }) {
 
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { currentMonthIncome } = useLendo()
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [amount, setAmount] = useState('')
@@ -34,6 +36,8 @@ export default function Finance() {
   const [tab, setTab] = useState('overview')
 
   const total = monthlyTotal()
+  const income = currentMonthIncome()
+  const net = income - total
   const cats = byCategory()
   const left = remaining()
   const isOver = left < 0
@@ -64,6 +68,24 @@ export default function Finance() {
 
       {/* Overview card */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.06), rgba(139,92,246,0.06))' }}>
+        {income > 0 && (
+          <div className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-xl" style={{ background: 'rgba(0,0,0,0.2)' }}>
+            <div className="text-center">
+              <div className="text-sm font-bold" style={{ color: 'var(--success)' }}>+{formatShortISK(income)}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Tekjur (Lendó)</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-bold" style={{ color: 'var(--danger)' }}>-{formatShortISK(total)}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Útgjöld</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-bold" style={{ color: net >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
+                {net >= 0 ? '+' : ''}{formatShortISK(net)}
+              </div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>Nettó</div>
+            </div>
+          </div>
+        )}
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs mb-1" style={{ color: 'var(--muted)' }}>Útgjöld þessa mánaðar</div>

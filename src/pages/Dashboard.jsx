@@ -8,6 +8,32 @@ import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
 import LendoWidget from '../components/widgets/LendoWidget'
 import SportsWidget from '../components/widgets/SportsWidget'
+import { useSubscriptions } from '../hooks/useSubscriptions'
+import { NavLink } from 'react-router-dom'
+import { formatISK } from '../utils/currency'
+
+function SubRenewalBanner() {
+  const { renewingSoon } = useSubscriptions()
+  const renewing = renewingSoon()
+  if (renewing.length === 0) return null
+  const first = renewing[0]
+  const days = Math.ceil((new Date(first.nextDate) - new Date()) / 86400000)
+  return (
+    <NavLink to="/subscriptions"
+      className="card flex items-center gap-3 py-3"
+      style={{ background: 'rgba(249,115,22,0.07)', border: '1px solid rgba(249,115,22,0.2)', textDecoration: 'none' }}>
+      <span className="text-xl shrink-0">{first.icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium">{first.name} endurnýjast</div>
+        <div className="text-xs" style={{ color: '#f97316' }}>
+          {days === 0 ? 'Í dag' : `Eftir ${days} daga`} · {formatISK(first.amount)}
+          {renewing.length > 1 ? ` (+${renewing.length - 1} fleiri)` : ''}
+        </div>
+      </div>
+      <span className="text-xs shrink-0" style={{ color: '#f97316' }}>→</span>
+    </NavLink>
+  )
+}
 
 function AudibleBanner() {
   const credits = 11
@@ -52,6 +78,9 @@ export default function Dashboard() {
           </span>
         </div>
       </div>
+
+      {/* Subscription renewal alert */}
+      <SubRenewalBanner />
 
       {/* Audible reminder */}
       <AudibleBanner />

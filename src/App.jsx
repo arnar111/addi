@@ -9,6 +9,7 @@ import Timer from './pages/Timer'
 import Settings from './pages/Settings'
 import Lendo from './pages/Lendo'
 import Sports from './pages/Sports'
+import Subscriptions from './pages/Subscriptions'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/lendo" element={<Lendo />} />
             <Route path="/sports" element={<Sports />} />
+            <Route path="/subscriptions" element={<Subscriptions />} />
           </Routes>
         </div>
       </main>

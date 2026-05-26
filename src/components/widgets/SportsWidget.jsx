@@ -6,7 +6,7 @@ const FORM_COLOR = { W: '#22c55e', D: '#f97316', L: '#ef4444' }
 const FORM_BG = { W: 'rgba(34,197,94,0.15)', D: 'rgba(249,115,22,0.15)', L: 'rgba(239,68,68,0.15)' }
 
 export default function SportsWidget() {
-  const { recentForm, arsenalStanding, upcomingFixtures, results, fixtures } = useSports()
+  const { recentForm, arsenalStanding, results, fixtures } = useSports()
 
   const nextMatch = fixtures[0] || null
   const lastMatch = results[0] || null
