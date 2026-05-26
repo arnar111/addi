@@ -3,7 +3,7 @@ import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
-  const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [city, setCity] = useLocalStorage('addi_city', 'Garðabær')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
@@ -33,7 +33,7 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veður er sótt frá Open-Meteo API</p>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
