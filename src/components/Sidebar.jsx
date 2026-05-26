@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, CreditCard, Trophy, ShoppingCart, Sparkles } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, CreditCard, Trophy, ShoppingCart, Sparkles, Armchair } from 'lucide-react'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/habits', icon: Sparkles, label: 'Venjur' },
   { to: '/sports', icon: Trophy, label: 'Íþróttir' },
   { to: '/football', icon: Trophy, label: 'HM 2026' },
+  { to: '/lendo', icon: Armchair, label: 'Lendó 🪑' },
   { to: '/subs', icon: CreditCard, label: 'Áskriftir' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/timer', icon: Timer, label: 'Tímari' },

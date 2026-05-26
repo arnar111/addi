@@ -12,6 +12,7 @@ import Football from './pages/Football'
 import Shopping from './pages/Shopping'
 import Habits from './pages/Habits'
 import Sports from './pages/Sports'
+import Lendo from './pages/Lendo'
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/sports" element={<Sports />} />
             <Route path="/shopping" element={<Shopping />} />
             <Route path="/habits" element={<Habits />} />
+            <Route path="/lendo" element={<Lendo />} />
           </Routes>
         </div>
       </main>
