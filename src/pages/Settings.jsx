@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Info, Trash2 } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_income', 'addi_notes', 'addi_budget', 'lendo_bookings']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +33,6 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
         </div>
       </div>
 
@@ -45,7 +44,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '1.1.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -53,6 +52,28 @@ export default function Settings() {
             <div key={k} className="flex flex-col gap-0.5 p-2.5 rounded-xl" style={{ background: 'var(--surface2)' }}>
               <span className="text-xs" style={{ color: 'var(--muted)' }}>{k}</span>
               <span className="font-medium text-sm">{v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Features overview */}
+      <div className="card flex flex-col gap-3">
+        <div className="text-sm font-semibold">🚀 Í þessari útgáfu</div>
+        <div className="flex flex-col gap-2">
+          {[
+            ['🪑', 'Lendó leigurekstur', 'Bókanir, tekjur, greiðslur'],
+            ['⚽', 'Premier League tafla', 'Rauntíma stöður Arsenal & lið'],
+            ['💰', 'Tekjur & útgjöld', 'Heildarmynd af fjármálum'],
+            ['🔗', 'Flýtileiðir', 'Heimildin, Athletic, Reddit o.fl.'],
+            ['🌤️', 'Veður Reykjavík', 'Dagleg veðurspá'],
+          ].map(([icon, title, desc]) => (
+            <div key={title} className="flex items-start gap-3 py-2">
+              <span className="text-xl shrink-0">{icon}</span>
+              <div>
+                <div className="text-sm font-medium">{title}</div>
+                <div className="text-xs" style={{ color: 'var(--muted)' }}>{desc}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -73,7 +94,9 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum í appinu þar á meðal Lendó bókanir. Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
