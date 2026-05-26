@@ -1,13 +1,18 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, ExternalLink } from 'lucide-react'
+
+const MY_APPS = [
+  { name: 'lendoapp.is', desc: 'Lánveitingaapp', url: 'https://lendoapp.is', icon: '💳' },
+  { name: 'addiapp', desc: 'Þetta app', url: 'https://addiapp.netlify.app', icon: '⚡' },
+]
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
-  const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const [city, setCity] = useLocalStorage('addi_city', 'Garðabær')
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -30,11 +35,29 @@ export default function Settings() {
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
-            <MapPin size={11} /> Staður (veður)
+            <MapPin size={11} /> Staður
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
         </div>
+      </div>
+
+      {/* My apps */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <span>💻</span>
+          <span className="font-semibold text-sm">Mín öpp</span>
+        </div>
+        {MY_APPS.map(app => (
+          <a key={app.name} href={app.url} target="_blank" rel="noopener noreferrer"
+             className="flex items-center gap-3 py-2 rounded-xl px-2 transition-all hover:bg-[var(--surface2)]">
+            <span className="text-xl">{app.icon}</span>
+            <div className="flex-1">
+              <div className="text-sm font-medium">{app.name}</div>
+              <div className="text-xs" style={{ color: 'var(--muted)' }}>{app.desc}</div>
+            </div>
+            <ExternalLink size={13} style={{ color: 'var(--muted)' }} />
+          </a>
+        ))}
       </div>
 
       {/* App info */}
@@ -45,7 +68,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
