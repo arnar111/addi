@@ -5,7 +5,7 @@ import QuickTasksWidget from '../components/widgets/QuickTasksWidget'
 import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
-import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import QuickLinksWidget from '../components/widgets/QuickLinksWidget'
 import LendoWidget from '../components/widgets/LendoWidget'
 import SportsWidget from '../components/widgets/SportsWidget'
 import { useSubscriptions } from '../hooks/useSubscriptions'
@@ -94,8 +94,8 @@ export default function Dashboard() {
       {/* Arsenal / Sports */}
       <SportsWidget />
 
-      {/* Spotify */}
-      <SpotifyWidget />
+      {/* Quick links */}
+      <QuickLinksWidget />
 
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">

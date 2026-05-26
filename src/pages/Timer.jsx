@@ -32,7 +32,19 @@ export default function Timer() {
           if (s <= 1) {
             setRunning(false)
             if (modeId === 'pomodoro') setSessions(n => n + 1)
-            try { new Audio('https://www.soundjay.com/misc/bell-ringing-01.mp3').play() } catch {}
+            try {
+              const ctx = new (window.AudioContext || window.webkitAudioContext)()
+              const osc = ctx.createOscillator()
+              const gain = ctx.createGain()
+              osc.connect(gain); gain.connect(ctx.destination)
+              osc.frequency.value = 880
+              gain.gain.setValueAtTime(0.3, ctx.currentTime)
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5)
+              osc.start(); osc.stop(ctx.currentTime + 1.5)
+            } catch {}
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('Addi · Tímari', { body: 'Tíminn er útrunninn! 🎉', icon: '/favicon.svg' })
+            }
             return 0
           }
           return s - 1
@@ -62,9 +74,17 @@ export default function Timer() {
 
   return (
     <div className="flex flex-col gap-6 pb-4 animate-slide-up">
-      <div className="px-1 pt-2">
-        <h1 className="text-xl font-semibold">Tímari</h1>
-        <p className="text-sm" style={{ color: 'var(--muted)' }}>{sessions} Pomodoro lokins í dag</p>
+      <div className="flex items-center justify-between px-1 pt-2">
+        <div>
+          <h1 className="text-xl font-semibold">Tímari</h1>
+          <p className="text-sm" style={{ color: 'var(--muted)' }}>{sessions} Pomodoro lokins í dag</p>
+        </div>
+        {'Notification' in window && Notification.permission === 'default' && (
+          <button className="btn btn-ghost text-xs py-1.5"
+            onClick={() => Notification.requestPermission()}>
+            🔔 Leyfa tilkynningar
+          </button>
+        )}
       </div>
 
       {/* Mode selector */}

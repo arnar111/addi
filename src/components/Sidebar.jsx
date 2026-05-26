@@ -21,7 +21,7 @@ export default function Sidebar() {
         <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
              style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1.2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
