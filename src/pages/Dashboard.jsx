@@ -11,8 +11,6 @@ import LendoWidget from '../components/widgets/LendoWidget'
 import { Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const NAMES = ['Arnar', 'Addi']
-
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
 
@@ -21,15 +19,12 @@ export default function Dashboard() {
     return () => clearInterval(t)
   }, [])
 
-  const hour = time.getHours()
-  const greeting = hour < 5 ? 'Góða nótt' : hour < 12 ? 'Góðan daginn' : hour < 18 ? 'Góðan dag' : 'Gott kvöld'
-
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       {/* Header */}
       <div className="flex items-start justify-between px-1 pt-3">
         <div>
-          <div className="text-2xl font-bold">{greeting}, Arnar 👋</div>
+          <div className="text-2xl font-bold">{getGreeting()} 👋</div>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-sm" style={{ color: 'var(--muted)' }}>
               {formatTime(time)} · {formatDate(time)}

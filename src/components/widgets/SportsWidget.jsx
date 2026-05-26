@@ -44,11 +44,8 @@ export default function SportsWidget() {
     .slice(-2)
     .reverse()
 
-  const inFinalsMode = knicks.some(g =>
-    !g.completed && !g.inProgress &&
-    (g.opponent?.toLowerCase().includes('finals') ||
-     knicks.filter(g2 => g2.completed).length > 70)
-  )
+  // Knicks are in the 2026 NBA Finals — always show banner
+  const inFinalsMode = true
 
   return (
     <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,119,181,0.08), rgba(255,106,0,0.06))' }}>
