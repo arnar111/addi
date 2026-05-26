@@ -60,9 +60,33 @@ const LEAGUES = [
 
 const WC_START = new Date('2026-06-11T00:00:00')
 
+function parseNBAGame(event) {
+  const comp = event.competitions?.[0]
+  if (!comp) return null
+  const home = comp.competitors?.find(c => c.homeAway === 'home')
+  const away = comp.competitors?.find(c => c.homeAway === 'away')
+  if (!home || !away) return null
+  const statusType = event.status?.type
+  const homeName = home.team?.displayName || home.team?.name || 'Home'
+  const awayName = away.team?.displayName || away.team?.name || 'Away'
+  return {
+    id: event.id,
+    state: statusType?.state || 'pre',
+    status: statusType?.name,
+    statusShort: statusType?.shortDetail || statusType?.detail || '',
+    clock: event.status?.displayClock,
+    period: event.status?.period,
+    home: { name: homeName, abbr: home.team?.abbreviation || '', score: home.score ?? '0', winner: !!home.winner, logo: home.team?.logo },
+    away: { name: awayName, abbr: away.team?.abbreviation || '', score: away.score ?? '0', winner: !!away.winner, logo: away.team?.logo },
+    date: new Date(event.date),
+    isKnicks: homeName.includes('Knicks') || awayName.includes('Knicks'),
+  }
+}
+
 export function useSports() {
   const [football, setFootball] = useState([])
   const [golf, setGolf] = useState(null)
+  const [nba, setNba] = useState([])
   const [loading, setLoading] = useState(true)
 
   const daysToWorldCup = Math.max(0, Math.ceil((WC_START - new Date()) / (1000 * 60 * 60 * 24)))
@@ -106,7 +130,15 @@ export function useSports() {
         })
       })
       .catch(() => {})
+
+    fetchESPN('sports/basketball/nba/scoreboard')
+      .then(data => {
+        const games = (data.events || []).map(parseNBAGame).filter(Boolean)
+        const knicks = games.filter(g => g.isKnicks)
+        setNba(knicks.length > 0 ? knicks : games.slice(0, 6))
+      })
+      .catch(() => {})
   }, [])
 
-  return { football, golf, loading, daysToWorldCup }
+  return { football, golf, nba, loading, daysToWorldCup }
 }

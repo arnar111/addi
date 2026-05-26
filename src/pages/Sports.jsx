@@ -219,22 +219,120 @@ function WorldCupTab({ daysToWorldCup }) {
   )
 }
 
+function NBAGameCard({ game }) {
+  const isLive = game.state === 'in'
+  const isDone = game.state === 'post'
+  const isPre = game.state === 'pre'
+  return (
+    <div className="card py-3" style={{ borderColor: game.isKnicks ? 'rgba(0,119,190,0.3)' : 'var(--border)' }}>
+      <div className="flex items-center justify-between mb-3">
+        {isLive ? (
+          <span className="text-xs px-2 py-0.5 rounded-lg animate-pulse-soft font-semibold"
+                style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--danger)' }}>
+            🔴 LIVE{game.clock ? ` · Q${game.period} ${game.clock}` : ''}
+          </span>
+        ) : isDone ? (
+          <span className="text-xs" style={{ color: 'var(--muted)' }}>Lokið · {game.statusShort}</span>
+        ) : (
+          <span className="text-xs" style={{ color: 'var(--muted)' }}>
+            {game.date.toLocaleDateString('is-IS', { weekday: 'short', month: 'short', day: 'numeric' })}
+            {' · '}
+            {game.date.toLocaleTimeString('is-IS', { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        )}
+        {game.isKnicks && (
+          <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                style={{ background: 'rgba(0,119,190,0.2)', color: '#4fc3f7' }}>🗽 Knicks</span>
+        )}
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="flex-1 flex flex-col items-end gap-1.5">
+          {game.away.logo && (
+            <img src={game.away.logo} alt="" className="w-8 h-8 object-contain"
+                 onError={e => { e.target.style.display = 'none' }} />
+          )}
+          <span className="text-sm font-semibold text-right leading-tight"
+                style={{ color: game.away.winner && isDone ? 'var(--text)' : 'var(--muted)' }}>
+            {game.away.name}
+          </span>
+        </div>
+        <div className="shrink-0 flex flex-col items-center gap-0.5 min-w-[64px]">
+          {isDone || isLive ? (
+            <div className="text-2xl font-bold tabular-nums">
+              <span style={{ color: game.away.winner ? 'var(--text)' : 'var(--muted)' }}>{game.away.score}</span>
+              <span style={{ color: 'var(--muted)', margin: '0 4px' }}>–</span>
+              <span style={{ color: game.home.winner ? 'var(--text)' : 'var(--muted)' }}>{game.home.score}</span>
+            </div>
+          ) : (
+            <span className="text-xl font-semibold" style={{ color: 'var(--muted)' }}>vs</span>
+          )}
+        </div>
+        <div className="flex-1 flex flex-col items-start gap-1.5">
+          {game.home.logo && (
+            <img src={game.home.logo} alt="" className="w-8 h-8 object-contain"
+                 onError={e => { e.target.style.display = 'none' }} />
+          )}
+          <span className="text-sm font-semibold leading-tight"
+                style={{ color: game.home.winner && isDone ? 'var(--text)' : 'var(--muted)' }}>
+            {game.home.name}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function NBATab({ nba, loading }) {
+  const hasKnicks = nba.some(g => g.isKnicks)
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="card"
+           style={{ background: 'linear-gradient(135deg, rgba(0,119,190,0.12), rgba(245,130,32,0.08))', border: '1px solid rgba(0,119,190,0.2)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-3xl">🗽</span>
+          <div>
+            <div className="font-bold text-base" style={{ color: '#4fc3f7' }}>New York Knicks</div>
+            <div className="text-xs" style={{ color: '#f5a623', fontWeight: 600 }}>🏆 NBA Finals 2026</div>
+          </div>
+        </div>
+        <div className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Knicks-ið þitt er í úrslitaleikjum NBA. Go Knicks! 🏀
+        </div>
+      </div>
+      {loading ? (
+        <div className="card flex items-center justify-center py-8 gap-2" style={{ color: 'var(--muted)' }}>
+          <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> Hleður leikjum...
+        </div>
+      ) : nba.length === 0 ? (
+        <div className="card text-center py-8">
+          <div className="text-3xl mb-2">🏀</div>
+          <div className="text-sm font-semibold">Engir leikir í dag</div>
+        </div>
+      ) : (
+        nba.map(g => <NBAGameCard key={g.id} game={g} />)
+      )}
+    </div>
+  )
+}
+
 const TABS = [
+  { id: 'nba', label: '🏀 NBA' },
   { id: 'football', label: '⚽ Knattspyrna' },
   { id: 'golf', label: '⛳ Golf' },
   { id: 'worldcup', label: '🏆 HM 2026' },
 ]
 
 export default function Sports() {
-  const [tab, setTab] = useState('football')
-  const { football, golf, loading, daysToWorldCup } = useSports()
+  const searchTab = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('tab')
+  const [tab, setTab] = useState(searchTab || 'nba')
+  const { football, golf, nba, loading, daysToWorldCup } = useSports()
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       <div className="px-1 pt-2">
         <h1 className="text-xl font-semibold">Íþróttir</h1>
         <p className="text-sm" style={{ color: 'var(--muted)' }}>
-          {loading ? 'Hleður gögnum...' : `${football.length} leikir · Golf · HM 2026`}
+          {loading ? 'Hleður gögnum...' : `NBA · ${football.length} fótboltaleikir · Golf · HM 2026`}
         </p>
       </div>
 
@@ -296,6 +394,7 @@ export default function Sports() {
         </div>
       )}
 
+      {tab === 'nba' && <NBATab nba={nba} loading={loading} />}
       {tab === 'golf' && <GolfTab golf={golf} />}
       {tab === 'worldcup' && <WorldCupTab daysToWorldCup={daysToWorldCup} />}
     </div>

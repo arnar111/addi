@@ -9,6 +9,7 @@ import SpotifyWidget from '../components/widgets/SpotifyWidget'
 import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidget'
 import FootballWidget from '../components/widgets/FootballWidget'
 import CryptoWidget from '../components/widgets/CryptoWidget'
+import NBAWidget from '../components/widgets/NBAWidget'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useShopping } from '../hooks/useShopping'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
@@ -75,6 +76,7 @@ export default function Dashboard() {
 
       {/* Football + Subscription alerts */}
       <FootballWidget />
+      <NBAWidget />
       <SubscriptionAlertWidget />
 
       {/* Spotify */}
