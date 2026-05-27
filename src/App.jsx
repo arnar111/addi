@@ -13,6 +13,8 @@ import Shopping from './pages/Shopping'
 import Habits from './pages/Habits'
 import Sports from './pages/Sports'
 import Lendo from './pages/Lendo'
+import Links from './pages/Links'
+import More from './pages/More'
 
 export default function App() {
   return (
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="/shopping" element={<Shopping />} />
             <Route path="/habits" element={<Habits />} />
             <Route path="/lendo" element={<Lendo />} />
+            <Route path="/links" element={<Links />} />
+            <Route path="/more" element={<More />} />
           </Routes>
         </div>
       </main>

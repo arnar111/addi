@@ -10,20 +10,21 @@ import SubscriptionAlertWidget from '../components/widgets/SubscriptionAlertWidg
 import FootballWidget from '../components/widgets/FootballWidget'
 import CryptoWidget from '../components/widgets/CryptoWidget'
 import NBAWidget from '../components/widgets/NBAWidget'
+import WorldCupWidget from '../components/widgets/WorldCupWidget'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useShopping } from '../hooks/useShopping'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 const QUICK_LINKS = [
-  { name: 'Wolt', url: 'https://wolt.com/is/isl/reykjavik', icon: '🍕' },
+  { name: 'Wolt', url: 'https://wolt.com/is/isl/reykjavik', icon: '🛵' },
   { name: 'The Athletic', url: 'https://theathletic.com', icon: '📰' },
-  { name: 'Inter Milan', url: 'https://theathletic.com/tag/inter-milan/', icon: '⚫🔵' },
+  { name: 'Arsenal', url: 'https://theathletic.com/team/arsenal/', icon: '🔴' },
+  { name: 'Dropp', url: 'https://dropp.is', icon: '📦' },
+  { name: 'Duolingo', url: 'https://duolingo.com', icon: '🦜' },
+  { name: 'Audible', url: 'https://audible.com', icon: '📚' },
   { name: 'GitHub', url: 'https://github.com/arnar111', icon: '🐙' },
-  { name: 'Netlify', url: 'https://app.netlify.com', icon: '🚀' },
   { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' },
-  { name: 'Alfred.is', url: 'https://alfred.is', icon: '🏦' },
-  { name: 'Kringlan', url: 'https://kringlan.is', icon: '🛍️' },
 ]
 
 function ShoppingSnapshotWidget() {
@@ -73,6 +74,9 @@ export default function Dashboard() {
 
       {/* Weather */}
       <WeatherWidget />
+
+      {/* World Cup 2026 countdown */}
+      <WorldCupWidget />
 
       {/* Football + Subscription alerts */}
       <FootballWidget />
