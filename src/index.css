@@ -147,3 +147,27 @@ input[type="range"] {
 /* Number input remove arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Smooth transitions on interactive elements */
+a, button { transition: opacity 0.15s, transform 0.1s; }
+a:active, button:active { transform: scale(0.97); }
+
+/* Hide scrollbar but keep scroll */
+.scroll-hidden { scrollbar-width: none; -ms-overflow-style: none; }
+.scroll-hidden::-webkit-scrollbar { display: none; }
+
+/* Scale on press */
+.active\:scale-97:active { transform: scale(0.97); }
+.active\:scale-98:active { transform: scale(0.98); }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fadeIn 0.2s ease; }
+
+/* Football gradient */
+.football-gradient {
+  background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(0,212,170,0.06));
+  border: 1px solid rgba(139,92,246,0.2);
+}

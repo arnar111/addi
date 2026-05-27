@@ -7,6 +7,9 @@ import Finance from './pages/Finance'
 import Notes from './pages/Notes'
 import Timer from './pages/Timer'
 import Settings from './pages/Settings'
+import Football from './pages/Football'
+import Links from './pages/Links'
+import More from './pages/More'
 
 export default function App() {
   return (
@@ -17,11 +20,14 @@ export default function App() {
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 safe-top">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/football" element={<Football />} />
             <Route path="/finance" element={<Finance />} />
+            <Route path="/links" element={<Links />} />
+            <Route path="/tasks" element={<Tasks />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/more" element={<More />} />
           </Routes>
         </div>
       </main>
