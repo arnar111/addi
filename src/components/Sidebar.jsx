@@ -1,11 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, FolderKanban } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/sports', icon: () => <span>⚽</span>, label: 'Íþróttir', emoji: true },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
+  { to: '/projects', icon: FolderKanban, label: 'Verkefni' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
 ]
@@ -18,12 +20,12 @@ export default function Sidebar() {
         <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm"
              style={{ background: 'var(--accent)', color: '#000' }}>A</div>
         <span className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Addi</span>
-        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1</span>
+        <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v2</span>
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} end={to === '/'}
+        {NAV.map(({ to, icon: Icon, label, emoji }) => (
+          <NavLink key={to + label} to={to} end={to === '/'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
@@ -33,7 +35,10 @@ export default function Sidebar() {
             }>
             {({ isActive }) => (
               <>
-                <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                {emoji
+                  ? <span style={{ fontSize: 18, lineHeight: 1, width: 18 }}>⚽</span>
+                  : <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                }
                 {label}
               </>
             )}
@@ -42,7 +47,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
-        Arnar · Reykjavík
+        Arnar · Reykjavík 🇮🇸
       </div>
     </aside>
   )

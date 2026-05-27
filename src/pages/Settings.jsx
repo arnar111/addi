@@ -1,5 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, ExternalLink, Heart } from 'lucide-react'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
@@ -7,7 +7,7 @@ export default function Settings() {
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_incomes', 'addi_project_todos']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
@@ -33,7 +33,7 @@ export default function Settings() {
             <MapPin size={11} /> Staður (veður)
           </label>
           <input className="input text-sm" value={city} onChange={e => setCity(e.target.value)} />
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður er stilltur á Reykjavík</p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>Veðurstaður stilltur á Reykjavík 🇮🇸</p>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            ['Útgáfa', '1.0.0'],
+            ['Útgáfa', '2.0.0'],
             ['Útgáfudagur', 'Maí 2026'],
             ['Tækni', 'React + Vite'],
             ['Hýsing', 'Netlify'],
@@ -56,13 +56,41 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        <div className="flex items-center gap-2 pt-1 text-xs" style={{ color: 'var(--muted)' }}>
+          <Heart size={11} style={{ color: '#ef4444' }} />
+          Byggt af Claude fyrir Arnar Kjartansson · Reykjavík 🇮🇸
+        </div>
+      </div>
+
+      {/* Gagnleg tenglar */}
+      <div className="card flex flex-col gap-3">
+        <div className="font-semibold text-sm mb-1">Gagnleg tenglar</div>
+        {[
+          { label: 'GitHub', href: 'https://github.com/arnar111', icon: '🐙' },
+          { label: 'Netlify', href: 'https://app.netlify.com', icon: '🌐' },
+          { label: 'The Athletic', href: 'https://theathletic.com', icon: '📰' },
+          { label: 'CoinGecko (Crypto)', href: 'https://coingecko.com', icon: '🦎' },
+        ].map(link => (
+          <a
+            key={link.label}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 py-1"
+            style={{ textDecoration: 'none', color: 'var(--text)' }}
+          >
+            <span className="text-base">{link.icon}</span>
+            <span className="text-sm flex-1">{link.label}</span>
+            <ExternalLink size={12} style={{ color: 'var(--muted)' }} />
+          </a>
+        ))}
       </div>
 
       {/* PWA install hint */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
         <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
+          Á iPhone 16: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
           Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
         </p>
       </div>

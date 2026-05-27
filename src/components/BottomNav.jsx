@@ -1,18 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Layers } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Heim' },
-  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/sports', icon: () => <span style={{ fontSize: 18, lineHeight: 1 }}>⚽</span>, label: 'Íþróttir' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
-  { to: '/notes', icon: FileText, label: 'Minnisblöð' },
-  { to: '/timer', icon: Timer, label: 'Tímari' },
+  { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/more', icon: Layers, label: 'Fleiri' },
 ]
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
-         style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom md:hidden"
+         style={{ background: 'rgba(10,14,26,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)' }}>
       <div className="flex items-center justify-around px-2 pt-2 pb-1">
         {NAV.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} end={to === '/'}
