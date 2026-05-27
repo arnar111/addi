@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, CreditCard, ShoppingBag } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Wallet, FileText, Timer, Settings, CreditCard, ShoppingBag, Flame } from 'lucide-react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Mælaborð' },
   { to: '/tasks', icon: CheckSquare, label: 'Verkefni' },
+  { to: '/habits', icon: Flame, label: 'Venjur' },
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
   { to: '/subscriptions', icon: CreditCard, label: 'Áskriftir' },
   { to: '/wishlist', icon: ShoppingBag, label: 'Óskalisti' },
@@ -23,7 +24,7 @@ export default function Sidebar() {
         <span className="text-xs ml-auto" style={{ color: 'var(--muted)' }}>v1.1</span>
       </div>
 
-      <nav className="flex flex-col gap-1 flex-1">
+      <nav className="flex flex-col gap-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
         {NAV.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} end={to === '/'}
             className={({ isActive }) =>
@@ -43,7 +44,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="px-3 text-xs" style={{ color: 'var(--muted)' }}>
+      <div className="px-3 text-xs mt-4" style={{ color: 'var(--muted)' }}>
         Arnar · Reykjavík 🇮🇸
       </div>
     </aside>

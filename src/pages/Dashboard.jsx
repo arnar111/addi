@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getGreeting, formatTime, formatDate } from '../utils/time'
+import { formatTime, formatDate } from '../utils/time'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import WeatherWidget from '../components/widgets/WeatherWidget'
 import QuickTasksWidget from '../components/widgets/QuickTasksWidget'

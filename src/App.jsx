@@ -10,6 +10,7 @@ import Timer from './pages/Timer'
 import Settings from './pages/Settings'
 import Subscriptions from './pages/Subscriptions'
 import Wishlist from './pages/Wishlist'
+import Habits from './pages/Habits'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/habits" element={<Habits />} />
           </Routes>
         </div>
       </main>
