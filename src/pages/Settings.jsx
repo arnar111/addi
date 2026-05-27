@@ -1,18 +1,16 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Trash2, Info, Smartphone, Bell, ExternalLink } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Smartphone } from 'lucide-react'
 import { useSubscriptions } from '../hooks/useSubscriptions'
-import { useFinance } from '../hooks/useFinance'
 import { useHabits } from '../hooks/useHabits'
 import { useTasks } from '../hooks/useTasks'
-import { formatISK, formatShortISK } from '../utils/currency'
+import { formatShortISK } from '../utils/currency'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
-  const { monthlyTotal: subMonthly, yearlyTotal: subYearly, subs } = useSubscriptions()
-  const { monthlyTotal, budget } = useFinance()
-  const { habits, todayDone } = useHabits()
-  const { tasks, pending, done } = useTasks()
+  const { monthlyTotal: subMonthly, subs } = useSubscriptions()
+  const { habits } = useHabits()
+  const { tasks } = useTasks()
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
