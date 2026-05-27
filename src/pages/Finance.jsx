@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { formatISK, formatShortISK, EXPENSE_CATEGORIES } from '../utils/currency'
-import { Plus, Trash2, X, TrendingDown, TrendingUp, DollarSign } from 'lucide-react'
+import { Plus, Trash2, X, AlertCircle } from 'lucide-react'
+
+const SUB_ICONS = ['🌐', '🥤', '🎵', '☁️', '🤖', '📱', '🎬', '📰', '🎮', '💻']
+const SUB_COLORS = ['#00d4aa', '#8b5cf6', '#f97316', '#3b82f6', '#ec4899', '#22c55e']
 
 function CategoryBar({ cat, spent, budget }) {
   const pct = budget ? Math.min(100, Math.round((spent / budget) * 100)) : 0
@@ -26,12 +30,20 @@ function CategoryBar({ cat, spent, budget }) {
 
 export default function Finance() {
   const { addExpense, removeExpense, budget, setBudget, monthlyTotal, byCategory, remaining, recentExpenses } = useFinance()
+  const { subs, add: addSub, remove: removeSub, toggleActive, active: activeSubs, monthlyTotal: subsMonthly, yearlyTotal: subsYearly } = useSubscriptions()
   const [showForm, setShowForm] = useState(false)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
+  const [showSubForm, setShowSubForm] = useState(false)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('food')
   const [note, setNote] = useState('')
   const [tab, setTab] = useState('overview')
+  const [subName, setSubName] = useState('')
+  const [subAmount, setSubAmount] = useState('')
+  const [subCycle, setSubCycle] = useState('monthly')
+  const [subIcon, setSubIcon] = useState('📱')
+  const [subColor, setSubColor] = useState('#00d4aa')
+  const [subNote, setSubNote] = useState('')
 
   const total = monthlyTotal()
   const cats = byCategory()
@@ -46,6 +58,19 @@ export default function Finance() {
     setAmount('')
     setNote('')
     setShowForm(false)
+  }
+
+  const handleAddSub = (e) => {
+    e.preventDefault()
+    if (!subName.trim() || !subAmount || isNaN(Number(subAmount))) return
+    addSub(subName.trim(), Number(subAmount), subCycle, subIcon, subColor, subNote.trim())
+    setSubName('')
+    setSubAmount('')
+    setSubCycle('monthly')
+    setSubIcon('📱')
+    setSubColor('#00d4aa')
+    setSubNote('')
+    setShowSubForm(false)
   }
 
   return (
@@ -114,7 +139,7 @@ export default function Finance() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {[['overview', 'Yfirlit'], ['transactions', 'Færslur']].map(([t, l]) => (
+        {[['overview', 'Yfirlit'], ['transactions', 'Færslur'], ['subs', 'Áskriftir']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className="btn text-sm flex-1 justify-center"
             style={{
@@ -181,6 +206,134 @@ export default function Finance() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {tab === 'subs' && (
+        <div className="flex flex-col gap-3">
+          {/* Subs summary */}
+          <div className="card" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.06), rgba(0,212,170,0.06))' }}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-xs" style={{ color: 'var(--muted)' }}>
+                  {activeSubs.length} virkar áskriftir
+                </div>
+                <div className="text-2xl font-semibold mt-1">{formatISK(subsMonthly)}<span className="text-sm font-normal" style={{ color: 'var(--muted)' }}> / mán</span></div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+                  {formatISK(subsYearly)} / ár
+                </div>
+              </div>
+              <button onClick={() => setShowSubForm(!showSubForm)} className="btn btn-primary">
+                <Plus size={14} /> Áskrift
+              </button>
+            </div>
+          </div>
+
+          {/* Add sub form */}
+          {showSubForm && (
+            <form onSubmit={handleAddSub} className="card flex flex-col gap-3 animate-slide-up">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Ný áskrift</h3>
+                <button type="button" onClick={() => setShowSubForm(false)}>
+                  <X size={16} style={{ color: 'var(--muted)' }} />
+                </button>
+              </div>
+              <input className="input" placeholder="Heiti (t.d. Apple TV+)" autoFocus
+                value={subName} onChange={e => setSubName(e.target.value)} />
+              <div className="grid grid-cols-2 gap-2">
+                <input className="input" type="number" placeholder="Upphæð (ISK)"
+                  value={subAmount} onChange={e => setSubAmount(e.target.value)} />
+                <select className="input" value={subCycle} onChange={e => setSubCycle(e.target.value)}>
+                  <option value="monthly">Mánaðarlega</option>
+                  <option value="yearly">Árlega</option>
+                </select>
+              </div>
+              <input className="input" placeholder="Athugasemd (valkvæmt)"
+                value={subNote} onChange={e => setSubNote(e.target.value)} />
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs" style={{ color: 'var(--muted)' }}>Tákn</label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {SUB_ICONS.map(i => (
+                    <button key={i} type="button" onClick={() => setSubIcon(i)}
+                      className="aspect-square rounded-xl text-lg flex items-center justify-center transition-all"
+                      style={{
+                        background: subIcon === i ? `${subColor}22` : 'var(--surface2)',
+                        border: `1px solid ${subIcon === i ? subColor + '55' : 'transparent'}`,
+                      }}>{i}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs" style={{ color: 'var(--muted)' }}>Litur</label>
+                <div className="flex gap-2">
+                  {SUB_COLORS.map(c => (
+                    <button key={c} type="button" onClick={() => setSubColor(c)}
+                      className="w-8 h-8 rounded-full transition-all"
+                      style={{
+                        background: c,
+                        border: `2px solid ${subColor === c ? '#fff' : 'transparent'}`,
+                      }} />
+                  ))}
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary w-full justify-center">Bæta við</button>
+            </form>
+          )}
+
+          {/* Sub list */}
+          {subs.length === 0 ? (
+            <div className="card text-center py-8" style={{ color: 'var(--muted)' }}>
+              <div className="text-2xl mb-1">💳</div>
+              <div className="text-sm">Engar áskriftir skráðar</div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {subs.map(s => {
+                const monthlyEq = s.cycle === 'yearly' ? Math.round(s.amount / 12) : s.amount
+                return (
+                  <div key={s.id} className="card flex items-center gap-3 py-3"
+                       style={{ opacity: s.active ? 1 : 0.55 }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                         style={{ background: `${s.color}22`, border: `1px solid ${s.color}44` }}>
+                      {s.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm truncate">{s.name}</span>
+                        {s.note && (
+                          <span className="badge flex items-center gap-0.5"
+                                style={{ background: 'rgba(239,68,68,0.12)', color: 'var(--danger)' }}>
+                            <AlertCircle size={9} /> {s.note}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+                        {formatISK(s.amount)} / {s.cycle === 'yearly' ? 'ár' : 'mán'}
+                        {s.cycle === 'yearly' && ` · ≈ ${formatShortISK(monthlyEq)}/mán`}
+                      </div>
+                    </div>
+                    <button onClick={() => toggleActive(s.id)}
+                      className="text-xs px-2 py-1 rounded-lg shrink-0"
+                      style={{
+                        background: s.active ? 'rgba(34,197,94,0.12)' : 'var(--surface2)',
+                        color: s.active ? 'var(--success)' : 'var(--muted)',
+                        border: `1px solid ${s.active ? 'rgba(34,197,94,0.25)' : 'var(--border)'}`,
+                      }}>
+                      {s.active ? 'Virk' : 'Af'}
+                    </button>
+                    <button onClick={() => {
+                        if (confirm(`Eyða áskriftinni "${s.name}"?`)) removeSub(s.id)
+                      }} style={{ color: 'var(--muted)' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

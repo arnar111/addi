@@ -7,7 +7,7 @@ const NAV = [
   { to: '/finance', icon: Wallet, label: 'Fjármál' },
   { to: '/notes', icon: FileText, label: 'Minnisblöð' },
   { to: '/habits', icon: Flame, label: 'Vanur' },
-  { to: '/projects', icon: FolderKanban, label: 'Verkefni' },
+  { to: '/projects', icon: FolderKanban, label: 'Áætlanir' },
   { to: '/timer', icon: Timer, label: 'Tímari' },
   { to: '/settings', icon: Settings, label: 'Stillingar' },
 ]
