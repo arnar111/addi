@@ -15,6 +15,7 @@ export function useFinance() {
       other: 35000,
     }
   })
+  const [income, setIncome] = useLocalStorage('addi_income', [])
 
   const addExpense = (amount, category, note = '', date = null) => {
     setExpenses(prev => [{
@@ -30,6 +31,20 @@ export function useFinance() {
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 
+  const addIncome = (amount, source = 'other', note = '', date = null) => {
+    setIncome(prev => [{
+      id: Date.now().toString(),
+      amount: Number(amount),
+      source,
+      note,
+      date: date || new Date().toISOString(),
+    }, ...prev])
+  }
+
+  const removeIncome = (id) => {
+    setIncome(prev => prev.filter(e => e.id !== id))
+  }
+
   const currentMonth = () => {
     const now = new Date()
     return expenses.filter(e => {
@@ -38,7 +53,17 @@ export function useFinance() {
     })
   }
 
+  const currentMonthIncome = () => {
+    const now = new Date()
+    return income.filter(e => {
+      const d = new Date(e.date)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }
+
   const monthlyTotal = () => currentMonth().reduce((s, e) => s + e.amount, 0)
+  const monthlyIncome = () => currentMonthIncome().reduce((s, e) => s + e.amount, 0)
+  const netBalance = () => monthlyIncome() - monthlyTotal()
 
   const byCategory = () => {
     const m = currentMonth()
@@ -51,12 +76,16 @@ export function useFinance() {
 
   const remaining = () => budget.monthly - monthlyTotal()
 
-  const recentExpenses = expenses.slice(0, 20)
+  const recentExpenses = expenses.slice(0, 30)
+  const recentIncome = income.slice(0, 30)
 
   return {
     expenses, addExpense, removeExpense,
+    income, addIncome, removeIncome,
     budget, setBudget,
-    currentMonth, monthlyTotal, byCategory, remaining,
-    recentExpenses,
+    currentMonth, currentMonthIncome,
+    monthlyTotal, monthlyIncome, netBalance,
+    byCategory, remaining,
+    recentExpenses, recentIncome,
   }
 }

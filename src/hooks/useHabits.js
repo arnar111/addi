@@ -2,13 +2,17 @@ import { useLocalStorage } from './useLocalStorage'
 
 const todayStr = () => new Date().toISOString().split('T')[0]
 
+// Default habits tailored to Addi
+const DEFAULT_HABITS = [
+  { id: 'duolingo', name: 'Duolingo', icon: '🦉', color: '#58cc02', completions: [] },
+  { id: 'huel',     name: 'Huel',     icon: '🥤', color: '#00d4aa', completions: [] },
+  { id: 'workout',  name: 'Æfing',    icon: '🏋️', color: '#8b5cf6', completions: [] },
+  { id: 'water',    name: 'Vatn 2L',  icon: '💧', color: '#3b82f6', completions: [] },
+  { id: 'read',     name: 'Lesa',     icon: '📚', color: '#f97316', completions: [] },
+]
+
 export function useHabits() {
-  const [habits, setHabits] = useLocalStorage('addi_habits', [
-    { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
-  ])
+  const [habits, setHabits] = useLocalStorage('addi_habits_v2', DEFAULT_HABITS)
 
   const toggle = (id) => {
     const today = todayStr()
@@ -43,15 +47,19 @@ export function useHabits() {
 
   const streakFor = (id) => {
     const h = habits.find(h => h.id === id)
-    if (!h) return 0
+    if (!h || h.completions.length === 0) return 0
     let streak = 0
     const d = new Date()
+    // Check today first; if not done, start from yesterday
+    const todayDone = h.completions.includes(d.toISOString().split('T')[0])
+    if (!todayDone) d.setDate(d.getDate() - 1)
     while (true) {
       const s = d.toISOString().split('T')[0]
       if (h.completions.includes(s)) {
         streak++
         d.setDate(d.getDate() - 1)
       } else break
+      if (streak > 3650) break // safety
     }
     return streak
   }

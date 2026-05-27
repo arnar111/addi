@@ -1,17 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0e1a;
-  --surface: #111827;
-  --surface2: #1a2233;
-  --border: #1f2d40;
+  --bg: #080c18;
+  --surface: #0f1623;
+  --surface2: #161e2e;
+  --surface3: #1c2638;
+  --border: #1e2d42;
   --accent: #00d4aa;
   --accent2: #8b5cf6;
   --accent3: #f97316;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --yellow: #eab308;
+  --green: #22c55e;
   --text: #e2e8f0;
-  --muted: #64748b;
+  --muted: #556578;
   --danger: #ef4444;
   --success: #22c55e;
+  --spotify: #1db954;
+  --lendo: #00b4d8;
 }
 
 * {
@@ -23,34 +30,43 @@ html, body, #root {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   overscroll-behavior: none;
   margin: 0;
   padding: 0;
 }
 
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 .aurora-bg {
-  background: radial-gradient(ellipse at 20% 50%, rgba(0,212,170,0.07) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.07) 0%, transparent 60%),
-              var(--bg);
+  background:
+    radial-gradient(ellipse at 15% 40%, rgba(0,212,170,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(139,92,246,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(0,180,216,0.04) 0%, transparent 50%),
+    var(--bg);
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
 }
 
 .card-sm {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
+}
+
+.card-xs {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
 }
 
 .btn {
@@ -80,11 +96,12 @@ html, body, #root {
   border: 1px solid var(--border);
 }
 .btn-ghost:hover { background: var(--surface2); }
+.btn-ghost:active { transform: scale(0.97); }
 
 .btn-danger {
-  background: rgba(239,68,68,0.15);
+  background: rgba(239,68,68,0.12);
   color: var(--danger);
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid rgba(239,68,68,0.25);
 }
 
 .input {
@@ -110,28 +127,80 @@ html, body, #root {
   font-weight: 600;
 }
 
-@keyframes aurora {
-  0%, 100% { opacity: 0.5; transform: scale(1) translateX(0); }
-  50% { opacity: 0.9; transform: scale(1.08) translateX(8px); }
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
 }
-.animate-aurora { animation: aurora 10s ease-in-out infinite; }
+
+/* Progress bar */
+.progress-bar {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes aurora {
+  0%, 100% { opacity: 0.4; transform: scale(1) translateX(0); }
+  50% { opacity: 0.75; transform: scale(1.06) translateX(6px); }
+}
+.animate-aurora { animation: aurora 12s ease-in-out infinite; }
 
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.45; }
 }
 .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-slide-up { animation: slideUp 0.3s ease; }
+.animate-slide-up { animation: slideUp 0.28s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fadeIn 0.25s ease; }
+
+@keyframes pop {
+  0% { transform: scale(0.92); opacity: 0; }
+  70% { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop { animation: pop 0.22s ease; }
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes spinDot {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.spin { animation: spinDot 1s linear infinite; }
 
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
 .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+.safe-top-px { padding-top: max(env(safe-area-inset-top, 0px), 0px); }
 
-/* Checkbox custom */
+/* Checkbox */
 input[type="checkbox"] {
   accent-color: var(--accent);
   width: 16px;
@@ -139,11 +208,46 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-/* Range input */
-input[type="range"] {
-  accent-color: var(--accent);
-}
+/* Range */
+input[type="range"] { accent-color: var(--accent); }
 
-/* Number input remove arrows */
+/* No number arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(15,22,35,0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Football pill badge */
+.result-w { background: rgba(34,197,94,0.15); color: #22c55e; }
+.result-d { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.result-l { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+/* Tab buttons */
+.tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.tab-btn.active {
+  background: rgba(0,212,170,0.12);
+  color: var(--accent);
+}
+.tab-btn:not(.active) {
+  background: transparent;
+  color: var(--muted);
+}
+.tab-btn:not(.active):hover {
+  background: var(--surface2);
+  color: var(--text);
+}

@@ -1,10 +1,11 @@
-export function getGreeting(name = 'Arnar') {
+export function getGreeting() {
   const h = new Date().getHours()
-  if (h < 5) return `Góða nótt, ${name}`
-  if (h < 12) return `Góðan daginn, ${name}`
-  if (h < 17) return `Gott síðdegi, ${name}`
-  if (h < 22) return `Gott kvöld, ${name}`
-  return `Góða nótt, ${name}`
+  if (h < 5)  return 'Góða nótt, Addi 🌙'
+  if (h < 10) return 'Góðan morgun, Addi ☀️'
+  if (h < 12) return 'Góðan daginn, Addi 👋'
+  if (h < 17) return 'Hæ Addi! 🤙'
+  if (h < 22) return 'Gott kvöld, Addi 🌆'
+  return 'Góða nótt, Addi 🌙'
 }
 
 export function formatTime(date = new Date()) {
@@ -28,4 +29,13 @@ export function isToday(dateStr) {
 
 export function isPast(dateStr) {
   return new Date(dateStr) < new Date()
+}
+
+export function monthName(date = new Date()) {
+  return new Date(date).toLocaleDateString('is-IS', { month: 'long', year: 'numeric' })
+}
+
+export function currentMonthKey() {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
