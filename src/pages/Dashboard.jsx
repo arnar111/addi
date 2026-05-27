@@ -6,6 +6,9 @@ import HabitsWidget from '../components/widgets/HabitsWidget'
 import FinanceSnapshotWidget from '../components/widgets/FinanceSnapshotWidget'
 import QuickNoteWidget from '../components/widgets/QuickNoteWidget'
 import SpotifyWidget from '../components/widgets/SpotifyWidget'
+import CountdownWidget from '../components/widgets/CountdownWidget'
+import FootballWidget from '../components/widgets/FootballWidget'
+import LendoWidget from '../components/widgets/LendoWidget'
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date())
@@ -19,7 +22,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
       {/* Header */}
       <div className="px-1 pt-2">
-        <div className="text-2xl font-semibold">{getGreeting()}</div>
+        <div className="text-2xl font-bold">{getGreeting()}</div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-sm" style={{ color: 'var(--muted)' }}>
             {formatTime(time)} · {formatDate(time)}
@@ -27,17 +30,26 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* London countdown — always top */}
+      <CountdownWidget />
+
       {/* Weather */}
       <WeatherWidget />
 
       {/* Spotify */}
       <SpotifyWidget />
 
+      {/* Football quick view */}
+      <FootballWidget />
+
       {/* Tasks + Habits side by side on desktop */}
       <div className="grid md:grid-cols-2 gap-4">
         <QuickTasksWidget />
         <HabitsWidget />
       </div>
+
+      {/* Lendó income */}
+      <LendoWidget />
 
       {/* Finance snapshot */}
       <FinanceSnapshotWidget />

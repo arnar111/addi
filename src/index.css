@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0e1a;
-  --surface: #111827;
-  --surface2: #1a2233;
-  --border: #1f2d40;
+  --bg: #080c18;
+  --surface: #0f1624;
+  --surface2: #161e2e;
+  --border: #1e2d42;
   --accent: #00d4aa;
   --accent2: #8b5cf6;
   --accent3: #f97316;
   --text: #e2e8f0;
-  --muted: #64748b;
+  --muted: #5a7090;
   --danger: #ef4444;
   --success: #22c55e;
 }
@@ -23,56 +23,66 @@ html, body, #root {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   overscroll-behavior: none;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* Aurora background with subtle animation */
 .aurora-bg {
-  background: radial-gradient(ellipse at 20% 50%, rgba(0,212,170,0.07) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.07) 0%, transparent 60%),
-              var(--bg);
+  background:
+    radial-gradient(ellipse at 15% 40%, rgba(0,212,170,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(139,92,246,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 60% 80%, rgba(59,130,246,0.04) 0%, transparent 50%),
+    var(--bg);
 }
 
+/* Cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
 }
 
 .card-sm {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
 }
 
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 9px 16px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
   text-decoration: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .btn-primary {
   background: var(--accent);
   color: #000;
+  font-weight: 600;
 }
-.btn-primary:hover { opacity: 0.85; }
-.btn-primary:active { transform: scale(0.97); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.96); opacity: 0.9; }
 
 .btn-ghost {
   background: transparent;
@@ -80,27 +90,46 @@ html, body, #root {
   border: 1px solid var(--border);
 }
 .btn-ghost:hover { background: var(--surface2); }
+.btn-ghost:active { transform: scale(0.97); }
 
 .btn-danger {
-  background: rgba(239,68,68,0.15);
+  background: rgba(239,68,68,0.12);
   color: var(--danger);
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid rgba(239,68,68,0.25);
 }
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
 
+/* Inputs */
 .input {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 11px 14px;
   font-size: 14px;
   color: var(--text);
   outline: none;
   width: 100%;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.input:focus { border-color: var(--accent); }
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,212,170,0.1);
+}
 .input::placeholder { color: var(--muted); }
 
+/* Select */
+select.input {
+  cursor: pointer;
+}
+
+/* Textarea */
+textarea.input {
+  resize: none;
+}
+
+/* Badge */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -110,28 +139,42 @@ html, body, #root {
   font-weight: 600;
 }
 
+/* Animations */
 @keyframes aurora {
   0%, 100% { opacity: 0.5; transform: scale(1) translateX(0); }
-  50% { opacity: 0.9; transform: scale(1.08) translateX(8px); }
+  50% { opacity: 0.85; transform: scale(1.06) translateX(6px); }
 }
-.animate-aurora { animation: aurora 10s ease-in-out infinite; }
+.animate-aurora { animation: aurora 12s ease-in-out infinite; }
 
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.45; }
 }
 .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-slide-up { animation: slideUp 0.3s ease; }
+.animate-slide-up { animation: slideUp 0.28s ease; }
 
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* Safe area */
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px); }
 .safe-top { padding-top: env(safe-area-inset-top, 0px); }
 
-/* Checkbox custom */
+/* iOS-style touch */
+@media (max-width: 768px) {
+  .btn { min-height: 42px; }
+  .input { min-height: 44px; font-size: 16px; } /* prevent zoom on iOS */
+}
+
+/* Checkbox */
 input[type="checkbox"] {
   accent-color: var(--accent);
   width: 16px;
@@ -139,7 +182,7 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-/* Range input */
+/* Range */
 input[type="range"] {
   accent-color: var(--accent);
 }
@@ -147,3 +190,12 @@ input[type="range"] {
 /* Number input remove arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Links */
+a { color: inherit; }
+
+/* Circular timer */
+.timer-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
