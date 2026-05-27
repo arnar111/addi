@@ -1,16 +1,33 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { User, MapPin, Palette, Trash2, Info, RefreshCw } from 'lucide-react'
+import { User, MapPin, Trash2, Info, Smartphone, Bell, ExternalLink } from 'lucide-react'
+import { useSubscriptions } from '../hooks/useSubscriptions'
+import { useFinance } from '../hooks/useFinance'
+import { useHabits } from '../hooks/useHabits'
+import { useTasks } from '../hooks/useTasks'
+import { formatISK, formatShortISK } from '../utils/currency'
 
 export default function Settings() {
   const [name, setName] = useLocalStorage('addi_name', 'Arnar')
   const [city, setCity] = useLocalStorage('addi_city', 'Reykjavík')
+  const { monthlyTotal: subMonthly, yearlyTotal: subYearly, subs } = useSubscriptions()
+  const { monthlyTotal, budget } = useFinance()
+  const { habits, todayDone } = useHabits()
+  const { tasks, pending, done } = useTasks()
 
   const clearData = () => {
     if (!confirm('Ertu viss? Þetta mun eyða öllum gögnum!')) return
-    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget']
+    const keys = ['addi_tasks', 'addi_habits', 'addi_expenses', 'addi_notes', 'addi_budget', 'addi_income', 'addi_subscriptions']
     keys.forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
+
+  const dataSize = (() => {
+    let total = 0
+    for (let key in localStorage) {
+      if (key.startsWith('addi_')) total += (localStorage[key] || '').length
+    }
+    return (total / 1024).toFixed(1)
+  })()
 
   return (
     <div className="flex flex-col gap-4 pb-4 animate-slide-up">
@@ -37,6 +54,27 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Stats */}
+      <div className="card flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Info size={15} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm">Tölfræði</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            ['✅ Verkefni', `${tasks.length} total`],
+            ['🔥 Vanir', `${habits.length} vanir`],
+            ['💳 Áskriftir', `${formatShortISK(subMonthly)}/mán`],
+            ['💾 Gögn', `${dataSize} KB`],
+          ].map(([k, v]) => (
+            <div key={k} className="flex flex-col gap-0.5 p-2.5 rounded-xl" style={{ background: 'var(--surface2)' }}>
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>{k}</span>
+              <span className="font-medium text-sm">{v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* App info */}
       <div className="card flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-1">
@@ -60,10 +98,15 @@ export default function Settings() {
 
       {/* PWA install hint */}
       <div className="card flex flex-col gap-2" style={{ border: '1px solid rgba(0,212,170,0.2)' }}>
-        <div className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>📱 Setja upp á heimaskjá</div>
+        <div className="flex items-center gap-2">
+          <Smartphone size={15} style={{ color: 'var(--accent)' }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>Setja upp á heimaskjá</span>
+        </div>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Á iPhone: Veldu "Deila" → "Bæta við heimaskjá" til að nota Addi eins og native app.
-          Á Android: Veldu "Bæta við heimaskjá" úr Chrome valmynd.
+          <strong style={{ color: 'var(--text)' }}>iPhone (Safari):</strong> Veldu "Deila" (⬆️) → "Bæta við heimaskjá"
+        </p>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <strong style={{ color: 'var(--text)' }}>Android (Chrome):</strong> Veldu ⋮ → "Bæta við heimaskjá"
         </p>
       </div>
 
@@ -73,7 +116,9 @@ export default function Settings() {
           <Trash2 size={15} style={{ color: 'var(--danger)' }} />
           <span className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Hættuleg svæði</span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.</p>
+        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+          Þetta mun eyða öllum gögnum í appinu. Þetta er ekki hægt að afturkalla.
+        </p>
         <button onClick={clearData} className="btn btn-danger w-full justify-center">
           <Trash2 size={14} /> Eyða öllum gögnum
         </button>
