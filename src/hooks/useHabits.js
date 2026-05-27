@@ -2,13 +2,18 @@ import { useLocalStorage } from './useLocalStorage'
 
 const todayStr = () => new Date().toISOString().split('T')[0]
 
+// Personalized for Arnar "Addi" Kjartansson
+const DEFAULT_HABITS = [
+  { id: '1', name: 'Duolingo 🔥13ár', icon: '🦜', color: '#58cc02', completions: [] },
+  { id: '2', name: 'Hreyfingarækt', icon: '💪', color: '#00d4aa', completions: [] },
+  { id: '3', name: 'Hlustunar/lestur', icon: '🎧', color: '#8b5cf6', completions: [] },
+  { id: '4', name: 'Drekka 2L vatn', icon: '💧', color: '#3b82f6', completions: [] },
+  { id: '5', name: 'Þraukarinn prep', icon: '🏕️', color: '#f97316', completions: [] },
+  { id: '6', name: 'Kóðun', icon: '💻', color: '#ec4899', completions: [] },
+]
+
 export function useHabits() {
-  const [habits, setHabits] = useLocalStorage('addi_habits', [
-    { id: '1', name: 'Hreyfingarækt', icon: '🏋️', color: '#00d4aa', completions: [] },
-    { id: '2', name: 'Lesa', icon: '📚', color: '#8b5cf6', completions: [] },
-    { id: '3', name: 'Drekka vatn', icon: '💧', color: '#3b82f6', completions: [] },
-    { id: '4', name: 'Miðlunarreglur', icon: '🧘', color: '#f97316', completions: [] },
-  ])
+  const [habits, setHabits] = useLocalStorage('addi_habits', DEFAULT_HABITS)
 
   const toggle = (id) => {
     const today = todayStr()
